@@ -1,15 +1,17 @@
 package project.db.model;
-
+import project.db.data.Categoria;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import project.db.data.Cliente;
+import project.db.data.Ingrediente;
 import project.db.data.Ordine;
 import project.db.data.Prodotto;
 import project.db.data.ProdottoMenu;
 import project.db.data.Recensione;
+import project.db.data.Rider;
 
 public class ReadingModel {
 
@@ -25,7 +27,7 @@ public class ReadingModel {
     }
 
     public List<String> loadIngredienti(final String Codice_Prodotto){
-        return Prodotto.DAO.getIngredienti(connection, Codice_Prodotto);
+        return Ingrediente.DAO.getIngredienti(connection, Codice_Prodotto);
     }
 
     public List<Recensione> loadRecensioni(final String codiceUtente) {
@@ -36,7 +38,15 @@ public class ReadingModel {
         return Cliente.DAO.getCliente(connection, email, password);
     }
 
-    public boolean find(final String email, final String password) {
+    public boolean findRider(final String email, final String password) {
+        return Rider.DAO.find(connection, email, password);
+    }
+
+    public Rider getRider(final String email, final String password) {
+        return Rider.DAO.getRider(connection, email, password);
+    }
+
+    public boolean findClient(final String email, final String password) {
         return Cliente.DAO.find(connection, email, password);
     }
 
@@ -52,4 +62,35 @@ public class ReadingModel {
         return ProdottoMenu.DAO.getIngredienti(connection, codiceProdottoMenu);
     }
 
+    public Map<String, Integer> loadIngredientiFromRigaCarrello(final String codiceProdotto) {
+        return Ingrediente.DAO.getIngredientiWithQuantita(connection, codiceProdotto);
+    }
+
+      public boolean isProdottoOrdinato(final String codiceProdotto) {
+        return Prodotto.DAO.isStatoOrdinato(connection, codiceProdotto);
+    }
+
+    public Map<String, String> trovaMenuCheContengono(final String codiceProdotto) {
+        return Prodotto.DAO.trovaMenuCheLoContengono(connection, codiceProdotto);
+    }
+
+    public List<Ingrediente> loadIngredientiDisponibili() {
+        return Ingrediente.DAO.list(connection);
+    }
+
+    public List<Prodotto> loadProdottiDisponibili() {
+        return Prodotto.DAO.list(connection);
+    }
+
+    public List<String> loadCategorie() {
+        List<String> categorie = new ArrayList<>();
+        for (Categoria categoria : Categoria.DAO.list(connection)) {
+            categorie.add(categoria.getNomeCategoria());
+        }
+        return categorie;
+    }
+
+    public String getNextProdottoCode() {
+        return Prodotto.DAO.getProssimoCodice(connection, "PR", 3);
+    }
 }

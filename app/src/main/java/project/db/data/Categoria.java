@@ -31,15 +31,15 @@ public class Categoria {
 
     public static class DAO {
 
-        public List<Categoria> list(final Connection connection) {
+        public static List<Categoria> list(final Connection connection) {
             List<Categoria> categorie = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_CATEGORIE.get());
                 ResultSet resultSet = preparedStatement.executeQuery()) {
 
                     while (resultSet.next()) {
-                        String nomeCategoria = resultSet.getString("nome_categoria");
-                        String idCategoria = resultSet.getString("id_categoria");
+                        String nomeCategoria = resultSet.getString("Nome");
+                        String idCategoria = resultSet.getString("IDCategoria");
                         Categoria categoria = new Categoria(nomeCategoria, idCategoria);
                         categorie.add(categoria);
                     }
@@ -50,20 +50,45 @@ public class Categoria {
             return categorie;
         }
 
-        /*
-        public boolean checkByName(final Connection connection, final String idCategoria) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CHECK_CATEGORIA.get())) {
-                preparedStatement.setString(1, idCategoria);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    return resultSet.next();
-                }
+        public static List<String> getCategorieNames(final Connection connection) {
+            List<String> categorieNames = new ArrayList<>();
+
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_CATEGORIE.get());
+                ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                    while (resultSet.next()) {
+                        String nomeCategoria = resultSet.getString("nome_categoria");
+                        categorieNames.add(nomeCategoria);
+                    }
             } catch (SQLException e) {
-                throw new DAOException("Error checking if category exists", e);
+                throw new DAOException("Error listing category names", e);
             }
+
+            return categorieNames;
         }
-        */
 
+        public static String getCategoryNamebyCod(final Connection connection, final String nomeCategoria) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.GET_CATEGORIA_BY_NAME.get(), nomeCategoria);
+                ResultSet resultSet = preparedStatement.executeQuery()) {
 
+                    if (resultSet.next()) {
+                        return resultSet.getString("IDCategoria");
+                    }
+            } catch (SQLException e) {
+                throw new DAOException("Error getting category ID by name", e);
+            }
+
+            return null;
+        }
+
+        public boolean insert(final Connection connection, final String nomeCategoria, final String idCategoria) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_CATEGORIA.get(), nomeCategoria, idCategoria)) {
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new DAOException("Error inserting category", e);
+            }
+            return true;
+        }
     }
 
 

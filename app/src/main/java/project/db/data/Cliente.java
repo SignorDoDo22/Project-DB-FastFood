@@ -7,7 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.List;
+import java.util.Map;
 import project.db.Queries;
 import project.db.controller.DAOException;
 import project.db.controller.DAOUtils;
@@ -82,24 +83,16 @@ public class Cliente {
         }
 
 
-        public static boolean insert(final Connection connection, final String codiceUtente, final String username,
-        final String password, final String email, final String nome, final String cognome,
-        final Date dataDiNascita, final String telefono, final boolean rider) {
-
-
-
+        public static boolean insert(final Connection connection, Map<String, String> data) {
             try (PreparedStatement nuovoUtente = connection.prepareStatement(Queries.INSERIRE_CLIENTE.get())) {
-
-                nuovoUtente.setString(1, codiceUtente);
-                nuovoUtente.setString(2, username);
-                nuovoUtente.setString(3, password);
-                nuovoUtente.setString(4, email);
-                nuovoUtente.setString(5, nome);
-                nuovoUtente.setString(6, cognome);
-                nuovoUtente.setDate(7, new java.sql.Date(dataDiNascita.getTime())); // see note below
-                nuovoUtente.setString(8, telefono);
-                nuovoUtente.setBoolean(9, rider);
-                nuovoUtente.setInt(10, 0);
+                nuovoUtente.setString(1, getProssimoCodice(connection, "CU", 4));
+                nuovoUtente.setString(2, data.get("username"));
+                nuovoUtente.setString(3, data.get("password"));
+                nuovoUtente.setString(4, data.get("email"));
+                nuovoUtente.setString(5, data.get("nome"));
+                nuovoUtente.setString(6, data.get("cognome"));
+                nuovoUtente.setDate(7, java.sql.Date.valueOf(data.get("dataDiNascita")));
+                nuovoUtente.setString(8, data.get("telefono"));
 
                 int rowsInserted = nuovoUtente.executeUpdate();
                 return rowsInserted > 0;
@@ -118,10 +111,8 @@ public class Cliente {
                 ResultSet resultSet = preparedStatement.executeQuery();
             ){
                if (resultSet.next()) {
-                   System.out.println("DENTRO MODEL: Utente trovato: " + resultSet.getString("Username"));
                    return mapUtente(resultSet);
                } else {
-                    System.out.println("DENTRO MODEL: Utente non trovato");
                    return null;
                }
 
@@ -140,11 +131,41 @@ public class Cliente {
                     return true;
                 }
 
-                return false; // nessun utente trovato con quel codice
+                return false;
 
             } catch (final Exception e) {
                 throw new DAOException(e);
             }
+        }
+
+
+        public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
+            String ultimoCodice = getNextCodiceCliente(connection);
+
+            int numero;
+            if (ultimoCodice == null || ultimoCodice.isBlank()) {
+                numero = 1;
+            } else {
+                String codiceTrim = ultimoCodice.trim();
+                String parteNumerica = codiceTrim.substring(prefisso.length());
+                numero = Integer.parseInt(parteNumerica) + 1;
+            }
+
+            return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
+        }
+
+        public static String getNextCodiceCliente(Connection connection) {
+            String nextCodiceRider = null;
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ULTIMO_CLIENTE_CODICE.get());
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    nextCodiceRider = resultSet.getString(1);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return nextCodiceRider;
         }
 
 

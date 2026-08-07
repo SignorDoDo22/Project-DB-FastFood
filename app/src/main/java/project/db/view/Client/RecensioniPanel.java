@@ -1,9 +1,8 @@
 package project.db.view.Client;
-
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import project.db.controller.ControllerClientPanel;
 
@@ -28,25 +27,26 @@ public class RecensioniPanel extends JPanel {
         this.controllerClient = controllerClient;
         this.panneloScorrevole = new JPanel();
         this.pannelloCentrale = new JScrollPane(panneloScorrevole);
-
+        this.panneloScorrevole.setLayout(new BoxLayout(panneloScorrevole, BoxLayout.Y_AXIS));
         this.add(pannelloCentrale, BorderLayout.CENTER);
-
         this.titoloPanel = new JLabel("Recensioni");
         this.add(titoloPanel, BorderLayout.NORTH);
 
-
     }
 
-    public void Refresh(){
-        mostraRecensioni();
+    public void refresh(){
+        this.controllerClient.userRequestOrdiniRecensibili();
     }
 
-    public void mostraRecensioni(){
-        List<Ordine> ordini = controllerClient.userRequestOrdiniRecensibili();
+    public void mostraRecensioni(List<Ordine> ordini) {
+        System.out.println("RecensioniPanel: ordini recensibili: " + ordini.size());
+        panneloScorrevole.removeAll();
         for(Ordine ordine : ordini){
-            CardRecensione cardRecensione = new CardRecensione();
+            CardRecensione cardRecensione = new CardRecensione(ordine.getCodiceOrdine(), clientPanel, this);
             panneloScorrevole.add(cardRecensione);
         }
+        panneloScorrevole.revalidate();
+        panneloScorrevole.repaint();
     }
 
 }

@@ -3,7 +3,6 @@ package project.db.data;
 import project.db.Queries;
 import project.db.controller.DAOException;
 import project.db.controller.DAOUtils;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -25,14 +24,53 @@ public class ProdottoSingolo extends Prodotto {
 
     public static class DAO {
 
-        public static boolean insert(final Connection connection, final String Codice_Prodotto){
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_SINGOLO.get(), Codice_Prodotto)) {
+        public static boolean insert(final Connection connection, String codiceProdotto) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_SINGOLO.get(), codiceProdotto)) {
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 throw new DAOException(e);
             }
-
             return true;
+        }
+
+        public static String getLast(Connection connection){
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_SINGOLO.get())) {
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("Codice_Prodotto");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero dell'ultimo prodotto", e);
+            }
+            return null;
+        }
+
+        public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
+            String ultimoCodice = getLast(connection);
+
+            int numero;
+            if (ultimoCodice == null || ultimoCodice.isBlank()) {
+                numero = 1;
+            } else {
+                String codiceTrim = ultimoCodice.trim();
+                String parteNumerica = codiceTrim.substring(prefisso.length());
+                numero = Integer.parseInt(parteNumerica) + 1;
+            }
+
+            return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
+        }
+
+        public static boolean addIngredienteToProdotto(final Connection connection, final String codiceProdotto, final String nomeIngrediente, int quantita) {
+
+            String codiceIngrediente = Ingrediente.DAO.getIngredienteCodebyName(connection, nomeIngrediente);
+            System.out.println("PRODOTTO: Aggiunta ingrediente: " + nomeIngrediente + " con codice: " + codiceIngrediente + " al prodotto con codice: " + codiceProdotto);
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_COMPRENDE.get(), codiceIngrediente, codiceProdotto, quantita)) {
+                int rowsAffected = preparedStatement.executeUpdate();
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                throw new DAOException(e);
+            }
         }
 
     }

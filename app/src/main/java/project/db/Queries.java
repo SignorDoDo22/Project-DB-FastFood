@@ -16,7 +16,7 @@ public enum Queries {
             """),
 
     INSERIRE_INGREDIENTE("""
-            INSERT INTO Ingrediente (Codice_Ingrediente, Nome_Ingrediente, Vegano, SenzaGlutine, SenzaLattosio)
+            INSERT INTO Ingrediente (Codice_Ingrediente, Nome_Ingrediente, Vegano, Glutine, Lattosio)
             VALUES(?,?,?,?,?)
             """),
 
@@ -24,11 +24,29 @@ public enum Queries {
             SELECT * FROM Ingrediente
             """),
 
+    GET_LAST_INGREDIENTE("""
+            SELECT Codice_Ingrediente FROM Ingrediente ORDER BY Codice_Ingrediente DESC LIMIT 1
+            """),
+
+        GET_CATEGORIA_BY_NAME("""
+            SELECT IDCategoria FROM Categoria WHERE Nome = ?
+            """),
+
     TROVA_INGREDIENTE("""
             SELECT * FROM Ingrediente
-            WHERE Codice_Ingrediente = ?
-
+            WHERE Nome_Ingrediente = ?
             """),
+
+    INGREDIENTI_NON_PRESENTI("""
+            SELECT i.Nome_Ingrediente
+            FROM Ingrediente i
+            WHERE NOT EXISTS (
+            SELECT 1
+            FROM Comprende c
+            WHERE c.Codice_Prodotto = ?
+            AND c.Codice_Ingrediente = i.Codice_Ingrediente
+            );
+           """),
 
     INGREDIENTI_CONTENUTI("""
            SELECT nome_ingrediente
@@ -36,6 +54,15 @@ public enum Queries {
                 INNER JOIN Ingrediente i ON i.Codice_Ingrediente = c.Codice_Ingrediente
                 where Codice_Prodotto = ?
            """),
+        INGREDIENTI_CONTENUTI_Quantita("""
+           SELECT nome_ingrediente, quantita
+                FROM Comprende c
+                INNER JOIN Ingrediente i ON i.Codice_Ingrediente = c.Codice_Ingrediente
+                where Codice_Prodotto = ?
+           """),
+        GET_INGREDIENTE_BY_NAME("""
+            SELECT Codice_Ingrediente FROM Ingrediente WHERE Nome_Ingrediente = ?
+            """),
 
 
     // =================================================
@@ -76,8 +103,17 @@ public enum Queries {
 
     INSERIRE_CLIENTE("""
             INSERT INTO Cliente (Codice_Utente, Username, Password, Email, Nome,
-                Cognome, Data_di_Nascita, Telefono, NumOrdiniEffetuati)
-            VALUES(?,?,?,?,?,?,?,?,?)
+                Cognome, Data_di_Nascita, Telefono)
+            VALUES(?,?,?,?,?,?,?,?)
+            """),
+    MOSTRA_ULTIMO_CLIENTE_CODICE("""
+             SELECT Codice_Utente FROM Cliente ORDER BY Codice_Utente DESC LIMIT 1
+                """),
+
+    CERCA_RIDER("""
+            select *
+            from rider
+            where rider.Email = ? and rider.Password = ?
             """),
 
     MOSTRA_CLIENTI("""
@@ -95,21 +131,13 @@ public enum Queries {
             """),
 
     INSERIRE_RIDER("""
-            INSERT INTO Rider (Codice_Utente, Username, Password, Email, Nome,
-                Cognome, Data_di_Nascita, Telefono, RaitingMedioRider, Guadagno, Ordini_Totali_Consegnati)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?)
+            INSERT INTO Rider (Codice_Rider, Username, Password, Email, Nome,
+                Cognome, Data_di_Nascita, Telefono, RaitingMedioRider, Guadagno)
+            VALUES(?,?,?,?,?,?,?,?,?,?)
             """),
 
     MOSTRA_RIDER("""
             SELECT * FROM Rider
-            """),
-
-    CERCA_RIDER_PER_USERNAME("""
-            SELECT * FROM Rider WHERE Username = ? AND Password = ?
-            """),
-
-    CERCA_RIDER_PER_CODICE("""
-            SELECT * FROM Rider WHERE Codice_Utente = ?
             """),
 
     AGGIORNA_MEDIA_RIDER("""
@@ -118,24 +146,34 @@ public enum Queries {
                 SELECT AVG(r.Voto_Rider)
                 FROM Recensione r
                 JOIN Prende_in_carico p ON p.Codice_Ordine = r.Codice_Ordine
-                WHERE p.Codice_Utente = ?
+                WHERE p.Codice_Rider = ?
             )
-            WHERE Codice_Utente = ?
+            WHERE Codice_Rider = ?
+            """),
+
+    MOSTRA_ULTIMO_RIDER_CODICE("""
+            SELECT Codice_Rider FROM Rider ORDER BY Codice_Rider DESC LIMIT 1
             """),
 
     AGGIORNA_ORDINI_CONSEGNATI_RIDER("""
             UPDATE Rider SET Ordini_Totali_Consegnati = Ordini_Totali_Consegnati + 1
-            WHERE Codice_Utente = ?
+            WHERE Codice_Rider = ?
             """),
 
     AGGIORNA_GUADAGNO_TOTALE_RIDER("""
             UPDATE Rider
             SET GuadagnoTotale = GuadagnoTotale + ?
-            WHERE Codice_Utente = ?;
+            WHERE Codice_Rider = ?;
             """),
-    RIDER_PRENDE_IN_CARICO("""
-           INSERT INTO Prende_in_carico (Codice_Ordine, Compenso_Rider, Codice_Utente)
-           VALUES (?, ?, ?)
+
+    AGGIORNA_ORDINE_RIDER("""
+            UPDATE Ordine
+            SET Codice_Rider = ?
+            WHERE Codice_Ordine = ?
+            """),
+
+    GET_LAST_RIDER_CODICE("""
+            SELECT Codice_Rider FROM Rider ORDER BY Codice_Rider DESC LIMIT 1
             """),
 
 
@@ -144,16 +182,44 @@ public enum Queries {
     // PRODOTTO (+ Singolo/Menu)
     // =================================================
 
+    TROVA_MENU_CHE_CONTENGONO_PRODOTTO("""
+            SELECT m.Codice_Prodotto, p.Nome_Prodotto
+            FROM CompostoMenu cm
+            JOIN Menu m ON m.Codice_Prodotto = cm.Codice_Menu
+            JOIN Prodotto p ON p.Codice_Prodotto = m.Codice_Prodotto
+            WHERE cm.Codice_Prodotto = ?
+            """),
+
+    RENDI_NON_DISPONIBILE("""
+            UPDATE Prodotto SET Disponibile = 'N' WHERE Codice_Prodotto = ?
+            """),
+
+    GET_LAST_PRODOTTO("""
+            SELECT Codice_Prodotto FROM Prodotto ORDER BY Codice_Prodotto DESC LIMIT 1
+            """),
+
+    GET_LAST_SINGOLO("""
+            SELECT Codice_Prodotto FROM Singolo ORDER BY Codice_Prodotto DESC LIMIT 1
+            """),
+
+    ELIMINA_COMPONENTI_MENU_CATALOGO("""
+            DELETE FROM CompostoMenu WHERE Codice_Prodotto = ?
+            """),
+
+    ELIMINA_MENU("""
+            DELETE FROM Menu WHERE Codice_Prodotto = ?
+            """),
+
     INSERIRE_PRODOTTO("""
             INSERT INTO Prodotto (Codice_Prodotto, Nome_Prodotto, Descrizione_Prodotto, Prezzo_originario,
-            Disponibile, NumeroVolteOrdinato, IDCategoria, Codice_Sconto, Singolo)
-            VALUES(?,?,?,?,?,?,?,?,?)
+            Disponibile, IDCategoria, Singolo, Menu)
+            VALUES(?,?,?,?,?,?,?,?)
             """),
 
     INSERIRE_MENU_PADRE("""
             INSERT INTO Prodotto (Codice_Prodotto, Nome_Prodotto, Descrizione_Prodotto, Prezzo_originario,
-            Disponibile, NumeroVolteOrdinato, IDCategoria, Codice_Sconto, Menu)
-            VALUES(?,?,?,?,?,?,?,?,?)
+            Disponibile, IDCategoria, Menu)
+            VALUES(?,?,?,?,?,?,?)
             """),
 
     INSERIRE_SINGOLO("""
@@ -181,19 +247,14 @@ public enum Queries {
     AGGIORNA_PRODOTTO("""
             UPDATE Prodotto
             SET Nome_Prodotto = ?, Descrizione_Prodotto = ?, Prezzo_originario = ?,
-                Disponibile = ?, IDCategoria = ?, Codice_Sconto = ?
-            WHERE Codice_Prodotto = ?
-            """),
-
-    AGGIORNA_NUMERO_VOLTE_ORDINATO("""
-            UPDATE Prodotto SET NumeroVolteOrdinato = NumeroVolteOrdinato + 1
+                Disponibile = ?
             WHERE Codice_Prodotto = ?
             """),
 
     TROVA_MENU_CHE_CONTENGONO("""
             SELECT m.Codice_Prodotto, p.Nome_Prodotto
             FROM CompostoMenu cm
-            JOIN Menu m ON m.Codice_Prodotto = cm.Codice_Prodotto_Menu
+            JOIN Menu m ON m.Codice_Prodotto = cm.Codice_Menu
             JOIN Prodotto p ON p.Codice_Prodotto = m.Codice_Prodotto
             WHERE cm.Codice_Prodotto = ?
             """),
@@ -209,6 +270,9 @@ public enum Queries {
     ELIMINA_PRODOTTO("""
             DELETE FROM Prodotto WHERE Codice_Prodotto = ?
             """),
+    GET_CODICE_PRODOTTO_BY_NAME("""
+            SELECT Codice_Prodotto FROM Prodotto WHERE Nome_Prodotto = ?
+            """),
 
 
 
@@ -218,7 +282,7 @@ public enum Queries {
     // =================================================
 
     INSERIRE_COMPRENDE("""
-            INSERT INTO Comprende (Codice_Ingrediente, Codice_Prodotto) VALUES (?, ?)
+            INSERT INTO Comprende (Codice_Ingrediente, Codice_Prodotto, Quantita) VALUES (?, ?, ?)
             """),
 
     MOSTRA_RICETTA_PRODOTTO("""
@@ -236,14 +300,14 @@ public enum Queries {
             """),
 
     INSERIRE_COMPOSTO_MENU("""
-            INSERT INTO CompostoMenu (Codice_Prodotto_Menu, Codice_Prodotto, quantita) VALUES (?, ?, ?)
+            INSERT INTO CompostoMenu (Codice_Menu, Codice_Prodotto, quantita) VALUES (?, ?, ?)
             """),
 
     MOSTRA_COMPONENTI_MENU_CATALOGO("""
             SELECT p.*, cm.quantita
             FROM CompostoMenu cm
             JOIN Prodotto p ON p.Codice_Prodotto = cm.Codice_Prodotto
-            WHERE cm.Codice_Prodotto_Menu = ?
+            WHERE cm.Codice_Menu = ?
             """),
 
     ELIMINA_DA_COMPOSTO_MENU("""
@@ -267,10 +331,12 @@ public enum Queries {
     MOSTRA_ORDINI("""
             SELECT * FROM Ordine
             """),
-        MOSTRA_ORDINI_PRONTI("""
-            SELECT *
-            from ordine
-            where pronto=1;
+
+    MOSTRA_ORDINI_PRONTI("""
+                SELECT *
+                FROM stato_ordine
+                INNER JOIN ordine ON ordine.Codice_Ordine = stato_ordine.Codice_Ordine
+                WHERE stato_ordine.Stato = 'Pronto' AND ordine.Codice_Rider IS NULL;
             """),
 
     CERCA_ORDINE_PER_CODICE("""
@@ -279,34 +345,21 @@ public enum Queries {
 
     MOSTRA_ORDINI_CLIENTE("""
             SELECT * FROM Ordine WHERE Codice_Utente = ?
-            ORDER BY DataCreazione DESC, OrarioCreazione DESC
+            ORDER BY DataCreazione DESC
             """),
 
     MOSTRA_ORDINI_DISPONIBILI("""
             SELECT o.* FROM Ordine o
             WHERE NOT EXISTS (SELECT 1 FROM Prende_in_carico p WHERE p.Codice_Ordine = o.Codice_Ordine)
-            ORDER BY o.DataCreazione, o.OrarioCreazione
+            ORDER BY o.DataCreazione
             """),
 
     MOSTRA_ORDINI_ASSEGNATI_RIDER("""
             SELECT o.* FROM Ordine o
             JOIN Prende_in_carico p ON p.Codice_Ordine = o.Codice_Ordine
             WHERE p.Codice_Utente = ?
-            ORDER BY o.DataCreazione DESC, o.OrarioCreazione DESC
+            ORDER BY o.DataCreazione DESC
             """),
-
-    AGGIORNA_ORARIO_CONSEGNA("""
-            UPDATE Ordine SET OrarioConsegna = ? WHERE Codice_Ordine = ?
-            """),
-
-    AGGIORNA_ORARIO_CONSEGNATO("""
-            UPDATE Ordine SET OrarioConsegnato = ? WHERE Codice_Ordine = ?
-            """),
-
-    ELIMINA_ORDINE("""
-            DELETE FROM Ordine WHERE Codice_Ordine = ?
-            """),
-
 
     // =================================================
     // PRENDE_IN_CARICO
@@ -386,6 +439,8 @@ public enum Queries {
             VALUES (?, ?, ?, ?)
             """),
 
+
+
     INSERIRE_MODIFICA_COMPONENTE_MENU("""
             INSERT INTO ModificaComponenteMenu (Codice_Ordine, CodiceRiga, NumRowCompMenu, Codice_Ingrediente, Tipo)
             VALUES (?, ?, ?, ?, ?)
@@ -416,16 +471,18 @@ public enum Queries {
             """),
 
     ESISTE_RECENSIONE("""
-            SELECT 1 FROM Recensione WHERE Codice_Ordine = ?
+                SELECT 1 FROM Recensione WHERE Codice_Ordine = ?
             """),
 
     MOSTRA_ORDINI_RECENSIBILI("""
                 SELECT o.*
-                FROM ordine o
-                WHERE o.Codice_Utente = ?
+                FROM Ordine o
+                INNER JOIN Stato_Ordine so ON so.Codice_Ordine = o.Codice_Ordine
+                WHERE so.Stato = 'Consegnato'
+                AND o.Codice_Utente = ?
                 AND NOT EXISTS (
                 SELECT 1
-                FROM recensione r
+                FROM Recensione r
                 WHERE r.Codice_Ordine = o.Codice_Ordine
                 );
         """);

@@ -1,53 +1,44 @@
-package project.db.view;
+package project.db.view.Registration;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.sql.Date;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JTextField;
+import javax.swing.JOptionPane;
+import javax.swing.text.DateFormatter;
+import project.db.controller.ControllerRegistrazione;
+import project.db.controller.MainController;
 import javax.swing.JPasswordField;
 import java.util.Map;
 
 public class RegistrazionePanel extends JPanel {
-    private JLabel codiceUtente;
-    private JLabel username;
-    private JLabel password;
-    private JLabel email;
-    private JLabel nome;
-    private JLabel cognome;
-    private Date dataDiNascita;
-    private JLabel telefono;
-    private MainView mainView;
-    private JButton registratiButton;
-    private JButton indietroButton;
+
+    protected ControllerRegistrazione controller;
+    protected MainController maincontroller;
+    protected JButton registratiButton;
+    protected JButton indietroButton;
     private JTextField codiceUtenteField;
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JTextField emailField;
     private JTextField nomeField;
     private JTextField cognomeField;
-    private JTextField dataDiNascitaField;
+    private JFormattedTextField dataDiNascitaField;
     private JTextField telefonoField;
     private Map<String, JTextField> userData;
 
 
-
-    public RegistrazionePanel(MainView mainView) {
-        this.mainView = mainView;
+    public RegistrazionePanel(ControllerRegistrazione controller, MainController maincontroller) {
+        this.controller = controller;
+        this.maincontroller = maincontroller;
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
-
-        gbc.gridx = 0; gbc.gridy = 0;
-        this.add(new JLabel("Codice Utente:"), gbc);
-
-        gbc.gridx = 1; gbc.gridy = 0;
-        this.codiceUtenteField = new JTextField(15);
-        this.add(codiceUtenteField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
         this.add(new JLabel("Username:"), gbc);
@@ -72,6 +63,7 @@ public class RegistrazionePanel extends JPanel {
         gbc.gridx = 1; gbc.gridy = 4;
         this.nomeField = new JTextField(15);
         this.add(nomeField, gbc);
+
         gbc.gridx = 0; gbc.gridy = 5;
         this.add(new JLabel("Cognome:"), gbc);
         gbc.gridx = 1; gbc.gridy = 5;
@@ -79,9 +71,12 @@ public class RegistrazionePanel extends JPanel {
         this.add(cognomeField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 6;
-        this.add(new JLabel("Data di Nascita:"), gbc);
+        this.add(new JLabel("Data di Nascita (AAAA-MM-GG):"), gbc);
         gbc.gridx = 1; gbc.gridy = 6;
-        this.dataDiNascitaField = new JTextField(15);
+        var dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        this.dataDiNascitaField = new JFormattedTextField(new DateFormatter(dateFormat));
+        this.dataDiNascitaField.setColumns(15);
         this.add(dataDiNascitaField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 7;
@@ -89,14 +84,15 @@ public class RegistrazionePanel extends JPanel {
         gbc.gridx = 1; gbc.gridy = 7;
         this.telefonoField = new JTextField(15);
         this.add(telefonoField, gbc);
+
         this.registratiButton = new JButton("Registrati");
         this.indietroButton = new JButton("Indietro");
         gbc.gridx = 0; gbc.gridy = 8;
         this.add(registratiButton, gbc);
         gbc.gridx = 0; gbc.gridy = 9;
         this.add(indietroButton, gbc);
+
         this.userData = Map.of(
-                "codiceUtente", codiceUtenteField,
                 "username", usernameField,
                 "password", passwordField,
                 "email", emailField,
@@ -106,20 +102,23 @@ public class RegistrazionePanel extends JPanel {
                 "telefono", telefonoField
         );
 
-        this.indietroButton.addActionListener(e -> mainView.changePanel("login"));
-        this.registratiButton.addActionListener(e -> {
-            if(mainView.tryRegistration()) {
-                System.out.println("Registrazione avvenuta con successo!");
-                mainView.changePanel("scelta");
-            } else {
-                System.out.println("Registrazione fallita. Controlla i dati inseriti.");
-            }
-        });
     }
 
-    public  Map<String, JTextField> getUserData() {
+    public Map<String, JTextField> getUserData() {
         return userData;
     }
 
+    public java.util.Date getDataDiNascita() {
+        Object value = dataDiNascitaField.getValue();
+        return (value instanceof java.util.Date) ? (java.util.Date) value : null;
+    }
+
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Errore nella creazione", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showSuccessMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Registrazione completata", JOptionPane.INFORMATION_MESSAGE);
+    }
 
 }

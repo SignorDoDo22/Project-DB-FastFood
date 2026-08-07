@@ -11,6 +11,7 @@ public class MainController {
     private MainView mainView;
     private ReadingModel modelReading;
     private WritingModel writingModel;
+    private ControllerAdmin controllerAdmin;
     private Connection connection;
     private ControllerClientPanel controllerClient;
     private ControllerRider controllerRider;
@@ -18,18 +19,70 @@ public class MainController {
     private final ControllerRegistrazione controllerRegistrazione;
 
     public MainController(final ReadingModel modelReading, final WritingModel writingModel, final Connection connection){
+
         this.modelReading = modelReading;
         this.writingModel = writingModel;
         this.connection = connection;
         this.mainView = new MainView(this);
-        this.controllerLogin = new ControllerLogin(this);
-        this.controllerClient = new ControllerClientPanel(modelReading, mainView.getClientPanel(), this);
-        this.controllerRider = new ControllerRider(this, modelReading, mainView.getRiderPanel());
-        this.controllerRegistrazione = new ControllerRegistrazione(mainView.getRegistrazionePanel(), this, modelReading, writingModel);
 
-        this.controllerLogin.setPanelLogin(mainView.getLoginPanel());
+        this.controllerLogin = new ControllerLogin(this, modelReading, writingModel);
+        this.controllerClient = new ControllerClientPanel(modelReading, writingModel, mainView.getClientPanel(), this);
+        this.controllerRider = new ControllerRider(this, modelReading, mainView.getRiderPanel());
+        this.controllerRegistrazione = new ControllerRegistrazione(this, modelReading, writingModel);
+        this.controllerAdmin = new ControllerAdmin(modelReading, writingModel, mainView.getAdminPanel());
+
+        this.mainView.getRiderPanel().setControllerRider(this.controllerRider);
         this.mainView.setVisible(true);
     }
+
+    public void changePanel(final String panelName, final String currentPanel) {
+
+        if("scelta".equals(panelName)) {
+            mainView.changePanel(panelName);
+        }
+
+        if(panelName.equals("loginRider") || panelName.equals("loginClient")) {
+            mainView.changePanel(panelName);
+        }
+
+        if(currentPanel.equals("scelta") && panelName.equals("loginRider")) {
+            mainView.changePanel(panelName);
+        }
+
+        if(currentPanel.equals("scelta") && panelName.equals("loginClient")) {
+            mainView.changePanel(panelName);
+        }
+
+        if("client".equals(panelName)) {
+            mainView.changePanel(panelName);
+            this.controllerClient.userRequestOrdiniRecensibili();
+            this.controllerClient.userRequestedCatalogo();
+        }
+
+        if("rider".equals(panelName)) {
+            mainView.changePanel(panelName);
+            this.controllerRider.showOrders();
+        }
+
+        if("registrationRider".equals(panelName) && currentPanel.equals("loginRider")) {
+            System.out.println("cambio pannello registrazione");
+            mainView.changePanel(panelName);
+        }
+
+        if("registrationClient".equals(panelName) && currentPanel.equals("loginClient")) {
+            System.out.println("cambio pannello registrazione");
+            mainView.changePanel(panelName);
+        }
+
+        if("admin".equals(panelName)) {
+            mainView.changePanel(panelName);
+        }
+
+        System.out.println("panelName: " + panelName);
+        System.out.println("currentPanel: " + currentPanel);
+    }
+
+
 
     public ControllerClientPanel getControllerClient(){
         return this.controllerClient;
@@ -54,7 +107,10 @@ public class MainController {
     public ControllerRider getControllerRider() {
         return this.controllerRider;
     }
+
     public ControllerRegistrazione getControllerRegistrazione() {
         return this.controllerRegistrazione;
     }
+
+
 }

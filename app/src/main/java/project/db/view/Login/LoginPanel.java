@@ -1,5 +1,9 @@
-package project.db.view;
+package project.db.view.Login;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,12 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import project.db.controller.ControllerLogin;
 
 public class LoginPanel extends JPanel {
 
@@ -21,16 +21,16 @@ public class LoginPanel extends JPanel {
     private JPasswordField password;
     private JTextField email;
     private JPanel panelInterno;
-    private MainView mainView;
     private JButton indietroButton;
-    private JButton loginButton;
-    private JButton registratiButton;
+    protected JButton loginButton;
+    protected JButton registratiButton;
     private Map<String, JTextField> userData;
+    protected ControllerLogin controller;
 
-    public LoginPanel(final MainView mainView) {
+    public LoginPanel(final ControllerLogin controller) {
+        this.controller = controller;
         userData = new HashMap<>();
         this.setLayout(new BorderLayout());
-        this.mainView = mainView;
         this.panelInterno = new JPanel();
         this.panelInterno.setLayout(new GridBagLayout());
 
@@ -44,11 +44,6 @@ public class LoginPanel extends JPanel {
         this.indietroButton = new JButton("Indietro");
         this.loginButton = new JButton("Login");
         this.registratiButton = new JButton("Registrati");
-
-        gbc.gridx = 0; gbc.gridy = 0;
-        panelInterno.add(new JLabel("Nome:"), gbc);
-        gbc.gridx = 1;
-        panelInterno.add(name, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
         panelInterno.add(new JLabel("Email:"), gbc);
@@ -81,36 +76,12 @@ public class LoginPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainView.changePanel("scelta");
+                controller.changePanel("scelta","login");
             }
         });
-
-        this.loginButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(mainView.tryLogin()){
-                    mainView.changePanel("client");
-                } else {
-                    System.out.println("Login fallito nel panel");
-                }
-            }
-        });
-
-        this.registratiButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Registrati button clicked");
-                mainView.changePanel("registration");
-            }
-        });
-
     }
 
-
     public Map<String, JTextField> getUserData() {
-        userData.put("name", name);
         userData.put("email", email);
         userData.put("password", password);
         return userData;

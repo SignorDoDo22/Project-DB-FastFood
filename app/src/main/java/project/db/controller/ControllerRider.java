@@ -12,7 +12,6 @@ public class ControllerRider {
     private ReadingModel modelReading;
     private RiderPanel riderPanel;
 
-
     public ControllerRider(MainController mainController, ReadingModel modelReading, RiderPanel riderPanel) {
         this.mainController = mainController;
         this.modelReading = modelReading;

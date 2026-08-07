@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -62,39 +63,84 @@ public class ProdottoCard extends JPanel {
 
         this.infoProdotto.addActionListener(new ActionListener() {
 
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("menu valore: " + isMenu);
                 if(isMenu != null){
                     clientPanel.requestIngredientiMenu(codiceProdotto);
                 } else {
-                    System.out.println("Richiesta ingredienti per prodotto: " + codiceProdotto);
                     clientPanel.requestIngredienti(codiceProdotto);
                 }
             }
-
         });
 
         this.aggiungiProdotto.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clientPanel.addRigaCarrello(1, nomeProdotto, prezzo);
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        int scelta = JOptionPane.showConfirmDialog(
+                    null,
+                    "Vuoi modificare il prodotto selezionato?",
+                    "Conferma modifica",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (scelta != JOptionPane.YES_OPTION) {
+                return;
+            }else{
+
+
+
             }
 
+        // 2) Chiedo la quantità desiderata
+        String input = JOptionPane.showInputDialog(
+                null,
+                "Inserisci la quantità desiderata:",
+                "Quantità prodotto",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        // L'utente ha annullato l'input
+        if (input == null) {
+            return;
+        }
+
+        int quantita;
+        try {
+            quantita = Integer.parseInt(input.trim());
+            if (quantita <= 0) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Inserisci un numero maggiore di zero.",
+                        "Valore non valido",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Devi inserire un numero valido.",
+                    "Errore",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        // 3) Aggiungo (o modifico) la riga nel carrello
+        clientPanel.addRigaCarrello(quantita, codiceProdotto, nomeProdotto, prezzo, isMenu != null);
+
+        }
         });
     }
-
     public String getCodiceProdotto() {
         return codiceProdotto;
     }
 
-
     public JButton getAggiungiProdotto() {
         return aggiungiProdotto;
     }
-
-
 
 }

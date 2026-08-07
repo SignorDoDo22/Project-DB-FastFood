@@ -3,8 +3,9 @@ package project.db.data;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-
+import java.util.Map;
 import project.db.Queries;
 import project.db.controller.DAOException;
 import project.db.controller.DAOUtils;
@@ -18,6 +19,7 @@ public class Prodotto {
     private float prezzoOriginario;
     private String singolo;
     private String menu;
+    private Map<String, Integer> ingredientiPresenti = new LinkedHashMap<>();
 
     public Prodotto(final boolean disponibile, final String codice_prodotto,
                      final String descrizioneProdotto, final float prezzoOriginario,
@@ -39,11 +41,12 @@ public class Prodotto {
     public float getPrezzoOriginario() { return prezzoOriginario; }
     public String getSingolo() { return singolo; }
     public String getMenu() { return menu; }
-
-    // Metodi di comodo, utili in View/Controller senza dover controllare null a mano
     public boolean isSingolo() { return singolo != null; }
     public boolean isMenu() { return menu != null; }
 
+    public void modificaIngredientiPresenti(String codiceIngrediente, int quantita) {
+        this.ingredientiPresenti.put(codiceIngrediente, quantita);
+    }
 
     public static class DAO {
 
@@ -112,21 +115,25 @@ public class Prodotto {
             }
         }
 
-        public static boolean insert(final Connection connection, final String codiceProdotto, final String nomeProdotto,
-            final String descrizioneProdotto, final float prezzoOriginario, final boolean disponibile, final String singolo, final String menu) {
+        public static boolean insert(final Connection connection, Map<String,String> dataProdotto, String tipo, String codice) {
 
-                try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_PRODOTTO.get())) {
-                preparedStatement.setString(1, codiceProdotto);
-                preparedStatement.setString(2, nomeProdotto);
-                preparedStatement.setString(3, descrizioneProdotto);
-                preparedStatement.setFloat(4, prezzoOriginario);
-                preparedStatement.setString(5, disponibile ? "S" : "N");
-                preparedStatement.setString(6, singolo);
-                preparedStatement.setString(7, menu);
-                if(menu != null){
-                    ProdottoMenu.DAO.insert(connection, codiceProdotto);
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_PRODOTTO.get())) {
+                preparedStatement.setString(1, codice);
+                preparedStatement.setString(2, dataProdotto.get("nomeProdotto"));
+                 preparedStatement.setString(3, dataProdotto.get("descrizione"));
+                preparedStatement.setFloat(4, Float.parseFloat(dataProdotto.get("prezzo")));
+                preparedStatement.setString(5, "S");
+                preparedStatement.setString(6, Categoria.DAO.getCategoryNamebyCod(connection, dataProdotto.get("idCategoria")));
+                preparedStatement.setString(7, (tipo == null) ? "S" : null);
+                preparedStatement.setString(8, tipo);
+
+                preparedStatement.executeUpdate();
+
+                if(tipo != null){
+                    ProdottoMenu.DAO.insert(connection, codice);
                 }else{
-                    ProdottoSingolo.DAO.insert(connection, codiceProdotto);
+                    System.out.println("PRODOTTO: Inserimento prodotto singolo: " + codice);
+                    ProdottoSingolo.DAO.insert(connection, codice);
                 }
 
             } catch (SQLException e) {
@@ -137,42 +144,152 @@ public class Prodotto {
         }
 
 
-       public static List<String> getIngredienti(final Connection connection, final String codiceProdotto) {
-            if (!check(connection, codiceProdotto)) {
-                return new ArrayList<>();
-            }
+        public static void eliminaProdottoSingolo(final Connection connection, final String codiceProdotto) {
+            try {
+                connection.setAutoCommit(false);
 
-            List<String> listaIngredienti = new ArrayList<>();
-
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INGREDIENTI_CONTENUTI.get())) {
-                preparedStatement.setString(1, codiceProdotto);
-
-                try (var result = preparedStatement.executeQuery()) {
-                    while (result.next()) {
-                        listaIngredienti.add(result.getString("nome_ingrediente"));
-                    }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_RICETTA.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO_SINGOLO.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
                 }
 
-            } catch (SQLException e) {
-                throw new DAOException("Errore durante il recupero degli ingredienti del prodotto", e);
-            }
+                connection.commit();
 
-            return listaIngredienti;
+            } catch (SQLException e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+                throw new DAOException("Errore durante l'eliminazione del prodotto", e);
+
+            } finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
 
-        public static boolean verificaQuantitaIngrediente(final Connection connection, final String codiceIngrediente, final int quantitaRichiesta) {
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_RICETTA_PRODOTTO.get())) {
-                preparedStatement.setString(1, codiceIngrediente);
-                preparedStatement.setInt(2, quantitaRichiesta);
-
+        public static boolean isStatoOrdinato(final Connection connection, final String codiceProdotto) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.VERIFICA_PRODOTTO_ORDINATO.get())) {
+                preparedStatement.setString(1, codiceProdotto);
                 try (var resultSet = preparedStatement.executeQuery()) {
                     return resultSet.next();
                 }
-
             } catch (SQLException e) {
-                throw new DAOException("Errore durante la verifica della quantità dell'ingrediente", e);
+                throw new DAOException("Errore nel controllo storico ordini del prodotto", e);
             }
         }
+
+        public static boolean aggiornaProdotto(final Connection connection, final String codiceProdotto, final String nome,
+                                              final String descrizione, final float prezzo, final boolean disponibile) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_PRODOTTO.get())) {
+                preparedStatement.setString(1, nome);
+                preparedStatement.setString(2, descrizione);
+                preparedStatement.setFloat(3, prezzo);
+                preparedStatement.setString(4, disponibile ? "S" : "N");
+                preparedStatement.setString(5, codiceProdotto);
+                int rowsAffected = preparedStatement.executeUpdate();
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                throw new DAOException("Errore durante l'aggiornamento del prodotto", e);
+            }
+        }
+
+         public static void rendiNonDisponibile(final Connection connection, final String codiceProdotto) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.RENDI_NON_DISPONIBILE.get())) {
+                preparedStatement.setString(1, codiceProdotto);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new DAOException("Errore durante l'aggiornamento della disponibilita'", e);
+            }
+        }
+
+        /** Rende non disponibili tutti i menu i cui codici sono passati (usato dopo aver avvisato l'Admin). */
+        public static void rendiNonDisponibiliMenu(final Connection connection, final List<String> codiciMenu) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.RENDI_NON_DISPONIBILE.get())) {
+                for (String codice : codiciMenu) {
+                    preparedStatement.setString(1, codice);
+                    preparedStatement.addBatch();
+                }
+                preparedStatement.executeBatch();
+            } catch (SQLException e) {
+                throw new DAOException("Errore durante la disabilitazione dei menu collegati", e);
+            }
+        }
+
+        public static Map<String, String> trovaMenuCheLoContengono(final Connection connection, final String codiceProdotto) {
+            Map<String, String> menu = new LinkedHashMap<>();
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.TROVA_MENU_CHE_CONTENGONO_PRODOTTO.get())) {
+                preparedStatement.setString(1, codiceProdotto);
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        menu.put(resultSet.getString("Codice_Prodotto"), resultSet.getString("Nome_Prodotto"));
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero dei menu collegati", e);
+            }
+            return menu;
+        }
+
+
+        public static String getLast(Connection connection){
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_PRODOTTO.get())) {
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("Codice_Prodotto");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero dell'ultimo prodotto", e);
+            }
+            return null;
+        }
+
+        public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
+            String ultimoCodice = getLast(connection);
+
+            int numero;
+            if (ultimoCodice == null || ultimoCodice.isBlank()) {
+                numero = 1;
+            } else {
+                String codiceTrim = ultimoCodice.trim();
+                String parteNumerica = codiceTrim.substring(prefisso.length());
+                numero = Integer.parseInt(parteNumerica) + 1;
+            }
+
+            return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
+        }
+
+        public static String getCodbyNome(final Connection connection, final String nomeProdotto) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_CODICE_PRODOTTO_BY_NAME.get(), nomeProdotto);
+                 var resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("Codice_Prodotto");
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero del codice prodotto per nome", e);
+            }
+            return null;
+        }
+
+
+
     }
 }

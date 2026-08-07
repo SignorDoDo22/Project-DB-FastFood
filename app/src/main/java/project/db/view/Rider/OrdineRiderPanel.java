@@ -3,6 +3,9 @@ package project.db.view.Rider;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import project.db.data.Ordine;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -37,12 +40,19 @@ public class OrdineRiderPanel extends JPanel {
         JPanel azionePanel = new JPanel();
         this.prendiInCaricoButton = new JButton("Prendi in carico");
         this.consegnaButton = new JButton("Consegna");
-
-
-
         azionePanel.add(prendiInCaricoButton);
         azionePanel.add(consegnaButton);
         this.add(azionePanel, BorderLayout.EAST);
+
+        this.prendiInCaricoButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+
+        });
+
     }
 
     public JButton getPrendiInCaricoButton() {

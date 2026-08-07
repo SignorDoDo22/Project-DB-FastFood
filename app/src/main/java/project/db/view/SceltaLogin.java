@@ -44,7 +44,7 @@ public class SceltaLogin extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainView.changePanel("login");
+                mainView.requestChangePanel("loginClient", "scelta");
             }
 
         });
@@ -53,7 +53,16 @@ public class SceltaLogin extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainView.changePanel("rider");
+                mainView.requestChangePanel("loginRider", "scelta");
+            }
+
+        });
+
+        this.adminButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainView.requestChangePanel("admin", "scelta");
             }
 
         });

@@ -17,13 +17,11 @@ public class RiderPanel extends JPanel {
     private JScrollPane scrollPane;
     private JPanel panelInterno;
     private JButton buttonIndietro;
-    private JButton buttonProcedi;
+    private JButton buttonRefresh;
     private ControllerRider controllerRider;
     private MainView mainView;
 
-
-    public RiderPanel(ControllerRider controllerRider, MainView mainView) {
-        this.controllerRider = controllerRider;
+    public RiderPanel( MainView mainView) {
         this.mainView = mainView;
 
         this.setVisible(true);
@@ -32,12 +30,15 @@ public class RiderPanel extends JPanel {
         this.panelInterno.setLayout(new BoxLayout(panelInterno, BoxLayout.Y_AXIS));
         this.scrollPane = new JScrollPane(panelInterno);
         this.buttonIndietro = new JButton("Indietro");
-        this.buttonProcedi = new JButton("Procedi e ordina");
+        this.buttonRefresh = new JButton("Refresh");
 
         this.add(scrollPane, BorderLayout.CENTER);
-        this.add(buttonIndietro, BorderLayout.SOUTH);
-        this.add(buttonProcedi, BorderLayout.SOUTH);
+        JPanel southPanel = new JPanel();
+        southPanel.add(buttonIndietro);
+        southPanel.add(buttonRefresh);
+        this.add(southPanel, BorderLayout.SOUTH);
 
+        this.buttonRefresh.addActionListener(e -> this.controllerRider.showOrders());
         this.buttonIndietro.addActionListener(e -> mainView.changePanel("scelta"));
     }
 
@@ -45,10 +46,13 @@ public class RiderPanel extends JPanel {
         panelInterno.removeAll();
         for (Ordine ordine : ordini) {
             OrdineRiderPanel ordineRiderPanel = new OrdineRiderPanel(ordine);
-            System.out.println("PANEL -- Ordine pronto: " + ordine.getCodiceOrdine());
             panelInterno.add(ordineRiderPanel);
         }
         panelInterno.revalidate();
         panelInterno.repaint();
+    }
+
+    public void setControllerRider(ControllerRider controllerRider) {
+        this.controllerRider = controllerRider;
     }
 }

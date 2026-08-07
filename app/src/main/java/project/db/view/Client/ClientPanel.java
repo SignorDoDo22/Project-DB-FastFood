@@ -26,7 +26,9 @@ public class ClientPanel extends JPanel {
     private final MainView mainView;
     private final JScrollPane pannelloCentrale;
     private final JPanel pannelScorrevole;
-    private final Carrello carrello;
+    private JButton refreshRecensioniButton;
+    private Carrello carrello;
+    private RecensioniPanel recensioniPanel;
     private final JButton buttonIndietro;
     private final JButton buttonProcedi;
     private ControllerClientPanel controllerClientPanel;
@@ -34,8 +36,7 @@ public class ClientPanel extends JPanel {
     public ClientPanel(final MainView mainView) {
         this.mainView = mainView;
         this.setLayout(new BorderLayout());
-        this.carrello = new Carrello(this);
-        this.carrello.setPreferredSize(new Dimension(225,0));
+
         this.pannelScorrevole = new JPanel();
         this.pannelScorrevole.setLayout(new BoxLayout(pannelScorrevole, BoxLayout.Y_AXIS));
 
@@ -49,20 +50,30 @@ public class ClientPanel extends JPanel {
         this.buttonIndietro = new JButton("Indietro");
         this.buttonProcedi = new JButton("Procedi e ordina");
 
+        this.refreshRecensioniButton = new JButton("Aggiorna Recensioni");
+        this.refreshRecensioniButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controllerClientPanel.userRequestOrdiniRecensibili();
+                revalidate();
+                repaint();
+            }
+        });
+
+        this.pannelloInferiore.add(refreshRecensioniButton);
+
         this.pannelloInferiore.add(buttonIndietro);
         this.pannelloInferiore.add(new JPanel());  // cella vuota centrale, per spaziatura
         this.pannelloInferiore.add(buttonProcedi);
-
         this.add(pannelloInferiore, BorderLayout.SOUTH);
-        this.add(carrello, BorderLayout.EAST);
 
         this.buttonIndietro.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainView.changePanel("scelta");
-            }
+                mainView.requestChangePanel("scelta", "client");
 
+            }
         });
     }
 
@@ -95,8 +106,11 @@ public class ClientPanel extends JPanel {
             return;
         }
 
-        String testo = String.join(", ", ingredienti);
-        JOptionPane.showMessageDialog(this, "Ingredienti: " + testo);
+        StringBuilder testo = new StringBuilder();
+        for (String ingrediente : ingredienti) {
+            testo.append(ingrediente).append("\n");
+        }
+        JOptionPane.showMessageDialog(this, "Ingredienti: " + testo.toString());
     }
 
     public void requestIngredientiMenu(String codiceProdottoMenu){
@@ -119,7 +133,29 @@ public class ClientPanel extends JPanel {
         JOptionPane.showMessageDialog(this, "Ingredienti del menu:\n" + testo.toString());
     }
 
-    public void addRigaCarrello(int quantita, String nomeProdotto, float prezzoUnitario) {
-        carrello.addRigaCarrello(quantita, nomeProdotto, prezzoUnitario);
+    public void addRigaCarrello(int quantita, String codiceProdotto, String nomeProdotto, float prezzoUnitario, boolean menu) {
+        carrello.addRigaCarrello(codiceProdotto, quantita, nomeProdotto, prezzoUnitario, menu);
     }
+
+    public void setCarrelloPanel(Carrello carrello){
+        this.carrello = carrello;
+        System.out.println("Carrello panel set in ClientPanel");
+        this.add(carrello, BorderLayout.EAST);
+    }
+
+    public void setRecensioniPanel(RecensioniPanel recensioniPanel){
+        this.recensioniPanel = recensioniPanel;
+        this.add(recensioniPanel, BorderLayout.WEST);
+    }
+
+    public void setControllerClientPanel(ControllerClientPanel controllerClientPanel){
+        this.controllerClientPanel = controllerClientPanel;
+    }
+
+    public void createRecensioni(String numOrdine, int votoRider, int votoOrdine, String testoRecensione) {
+        controllerClientPanel.userRequestCreateRecensione(numOrdine, votoRider, votoOrdine, testoRecensione);
+    }
+
+
+
 }

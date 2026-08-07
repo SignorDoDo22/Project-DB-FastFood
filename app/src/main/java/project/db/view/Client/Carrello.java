@@ -1,10 +1,15 @@
 package project.db.view.Client;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import project.db.controller.ControllerClientPanel;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
@@ -16,11 +21,11 @@ public class Carrello extends JPanel {
     private JLabel carrelloString;
     private JLabel totaleString;
     private JButton buttonProcedi;
+    private ControllerClientPanel controllerClientPanel;
+    private List<RigaCarrello> righeCarrello = new ArrayList<>();
 
-
-
-    public Carrello(final ClientPanel clientPanel){
-
+    public Carrello(final ClientPanel clientPanel, final ControllerClientPanel controllerClientPanel) {
+        this.controllerClientPanel = controllerClientPanel;
         this.clientPanel = clientPanel;
         this.setLayout(new BorderLayout());
         this.carrelloString = new JLabel("CART");
@@ -34,18 +39,23 @@ public class Carrello extends JPanel {
         this.add(scrollPanel, BorderLayout.CENTER);
         this.add(totaleString, BorderLayout.SOUTH);
 
-
     }
 
-    public void addRigaCarrello(int quantita, String nomeProdotto, float prezzoUnitario){
+    public void addRigaCarrello(String codiceProdotto, int quantita, String nomeProdotto, float prezzoUnitario, boolean menu){
 
-        RigaCarrello rigaOrdine = new RigaCarrello(prezzoUnitario, quantita, nomeProdotto, this);
+        RigaCarrello rigaOrdine = new RigaCarrello(menu, prezzoUnitario, quantita, nomeProdotto, codiceProdotto, this);
         this.panelscorrevole.add(rigaOrdine);
+        righeCarrello.add(rigaOrdine);
         this.revalidate();
         this.repaint();
     }
 
-    public void requestIngredientiPresenti(RigaCarrello rigaCarrello){
-
+    public void requestIngredientiPresenti(final RigaCarrello rigaCarrello){
+        controllerClientPanel.userRequestIngredientiFromRigaCarrello(rigaCarrello.getCodiceProdotto(), rigaCarrello);
     }
+
+    public List<RigaCarrello> getRigheCarrello() {
+        return righeCarrello;
+    }
+
 }

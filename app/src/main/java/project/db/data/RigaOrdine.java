@@ -8,7 +8,6 @@ public class RigaOrdine {
     private String codiceOrdine;
     private String codiceSconto;
     private int prezzo;
-    private String RigaProdottoMenu;
     private String RigaProdottoSingolo;
 
     public RigaOrdine(String codiceRiga, String codiceOrdine, String codiceSconto, int prezzo, String RigaProdottoMenu, String RigaProdottoSingolo) {
@@ -16,11 +15,16 @@ public class RigaOrdine {
         this.codiceOrdine = codiceOrdine;
         this.codiceSconto = codiceSconto;
         this.prezzo = prezzo;
-        this.RigaProdottoMenu = RigaProdottoMenu;
         this.RigaProdottoSingolo = RigaProdottoSingolo;
     }
 
     public static class DAO {
+
+        public String generateCodiceRiga() {
+
+            return null;
+
+        }
 
         List<RigaOrdine> list(Connection connection, String codiceOrdine) {
             return null;

@@ -3,7 +3,6 @@ package project.db.data;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,66 +13,25 @@ import project.db.controller.DAOUtils;
 public class Ordine {
 
     private Date dataCreazione;
-    private Time inPreparazione = null;
-    private Time inConsegna = null;
-    private Time consegnato = null;
     private String ind_via;
-    private Boolean pronto = false;
     private String ind_Città;
     private String ind_Civico;
     private String codice_Utente;
-
     private String codice_Ordine;
-
 
     public Ordine(final Date dataCreazione, final String ind_via, final String ind_Città, final String ind_Civico,
         final String codice_Utente, final String codice_Ordine){
 
         this.dataCreazione = dataCreazione;
-
         this.ind_Città = ind_Città;
         this.ind_via = ind_via;
         this.ind_Civico = ind_Civico;
-
         this.codice_Ordine = codice_Ordine;
         this.codice_Utente = codice_Utente;
     }
 
-    public void setInPreparazione(Time inPreparazione) {
-        this.inPreparazione = inPreparazione;
-    }
-
-    public void setInConsegna(Time inConsegna) {
-        this.inConsegna = inConsegna;
-    }
-
-    public void setConsegnato(Time consegnato) {
-        this.consegnato = consegnato;
-    }
-
-    public void setPronto(Boolean pronto) {
-        this.pronto = pronto;
-    }
-
     public Date getDataCreazione() {
         return dataCreazione;
-    }
-
-    public Time getInPreparazione() {
-        return inPreparazione;
-    }
-
-    public Time getInConsegna() {
-        return inConsegna;
-    }
-
-    public Time getConsegnato() {
-        return consegnato;
-    }
-
-
-    public Boolean getPronto() {
-        return pronto;
     }
 
     public String getIndVia() {
@@ -108,20 +66,12 @@ public class Ordine {
                 while (result.next()) {
 
                     var dataCreazione = result.getDate("DataCreazione");
-                    var consegnato = result.getTime("Consegnato");
-                    var consegnatoBool = result.getBoolean("Consegnato_Bool");
-                    var inConsegna = result.getTime("In_Consegna");
-                    var inPreparazione = result.getTime("In_Preparazione");
                     var indVia = result.getString("Ind_Via");
                     var indCittà = result.getString("Ind_Città");
                     var indCivico = result.getString("Ind_Civico");
                     var codiceUtente = result.getString("Codice_Utente");
                     var codiceordine = result.getString("Codice_Ordine");
                     Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente, codiceordine);
-                    ordine.setInPreparazione(inPreparazione);
-                    ordine.setInConsegna(inConsegna);
-                    ordine.setConsegnato(consegnato);
-                    ordine.setPronto(consegnatoBool);
                     listOrdine.add(ordine);
                 }
 
@@ -131,6 +81,8 @@ public class Ordine {
             return listOrdine;
         }
 
+
+        // DA MODIFICARE
         public static List<Ordine> OrdearReady(Connection connection){
             List<Ordine> ordiniPronti = new ArrayList<>();
 
@@ -140,20 +92,12 @@ public class Ordine {
                 while (result.next()) {
 
                     var dataCreazione = result.getDate("DataCreazione");
-                    var consegnato = result.getTime("OrarioConsegnato");
-                    var consegnatoBool = result.getBoolean("Pronto");
-                    var inConsegna = result.getTime("OrarioInConsegna");
-                    var inPreparazione = result.getTime("OrarioPreparazione");
                     var indVia = result.getString("Ind_Via");
                     var indCittà = result.getString("Ind_Citta");
                     var indCivico = result.getString("Ind_Civico");
                     var codiceUtente = result.getString("Codice_Utente");
                     var codiceordine = result.getString("Codice_Ordine");
                     Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente, codiceordine);
-                    ordine.setInPreparazione(inPreparazione);
-                    ordine.setInConsegna(inConsegna);
-                    ordine.setConsegnato(consegnato);
-                    ordine.setPronto(consegnatoBool);
                     System.out.println("Ordine pronto: " + codiceordine + " per l'utente: " + codiceUtente);
 
                     ordiniPronti.add(ordine);
@@ -173,26 +117,44 @@ public class Ordine {
                 try (ResultSet result = preparedStatement.executeQuery()) {
                     while (result.next()) {
                         var dataCreazione = result.getDate("DataCreazione");
-                        var consegnato = result.getTime("OrarioConsegnato");
-                        var consegnatoBool = result.getBoolean("Pronto");
-                        var inConsegna = result.getTime("OrarioInConsegna");
-                        var inPreparazione = result.getTime("OrarioPreparazione");
                         var indVia = result.getString("Ind_Via");
                         var indCittà = result.getString("Ind_Citta");
                         var indCivico = result.getString("Ind_Civico");
                         var codiceordine = result.getString("Codice_Ordine");
                         Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente, codiceordine);
-                        ordine.setInPreparazione(inPreparazione);
-                        ordine.setInConsegna(inConsegna);
-                        ordine.setConsegnato(consegnato);
-                        ordine.setPronto(consegnatoBool);
                         ordiniRecensibili.add(ordine);
                     }
                 }
             } catch (Exception e) {
                 throw new DAOException("Errore nel caricamento degli ordini recensibili", e);
             }
+            System.out.println("Numero di ordini recensibili per l'utente " + codiceUtente + ": " + ordiniRecensibili.size());
             return ordiniRecensibili;
+        }
+
+        public static boolean inserisciRecensione(Connection connection, String numOrdine, String testoRecensione, int votoOrdine, int votoRider) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_RECENSIONE.get())) {
+                preparedStatement.setString(1, numOrdine);
+                preparedStatement.setInt(2, votoRider);
+                preparedStatement.setString(3, testoRecensione);
+                preparedStatement.setInt(4, votoOrdine);
+                preparedStatement.executeUpdate();
+            } catch (Exception e) {
+                throw new DAOException("Errore nell'inserimento della recensione", e);
+            }
+
+            return true;
+        }
+
+        public static boolean prendeInCaricoOrdine(Connection connection, String codiceOrdine, String codiceRider) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_ORDINE_RIDER.get())) {
+                preparedStatement.setString(1, codiceRider);
+                preparedStatement.setString(2, codiceOrdine);
+                int rowsAffected = preparedStatement.executeUpdate();
+                return rowsAffected > 0;
+            } catch (Exception e) {
+                throw new DAOException("Errore nell'aggiornamento dell'ordine con il rider", e);
+            }
         }
 
     }
