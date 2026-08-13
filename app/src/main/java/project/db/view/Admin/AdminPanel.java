@@ -79,6 +79,10 @@ public class AdminPanel extends JPanel {
         form.add(new JLabel());
         form.add(btnElimina);
 
+        JButton btnCreaCategoria = new JButton("Crea Categoria");
+        btnCreaCategoria.addActionListener(e -> controller.userRequestCreateCategoriaPanel());
+        form.add(btnCreaCategoria);
+
         JButton createProdottoButton = new JButton("Crea Prodotto");
         createProdottoButton.addActionListener(e -> {
 
@@ -107,6 +111,9 @@ public class AdminPanel extends JPanel {
         JButton btnAggiorna = new JButton("Aggiorna elenco");
         btnAggiorna.addActionListener(e -> controller.userRequestedCatalogo());
         this.add(btnAggiorna, BorderLayout.NORTH);
+
+        JButton btnOrderStatus = new JButton("Gestisci ordini");
+        this.add(btnOrderStatus, BorderLayout.SOUTH);
     }
 
     public void setController(final ControllerAdmin controller) {
@@ -183,5 +190,12 @@ public class AdminPanel extends JPanel {
         JOptionPane.showMessageDialog(this, messaggio, "Errore", JOptionPane.ERROR_MESSAGE);
     }
 
+    public void mostraSuccesso(final String messaggio) {
+        JOptionPane.showMessageDialog(this, messaggio, "Successo", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void mostraDomandaConferma(final String messaggio) {
+        JOptionPane.showMessageDialog(this, messaggio, "Conferma", JOptionPane.INFORMATION_MESSAGE);
+    }
 
 }

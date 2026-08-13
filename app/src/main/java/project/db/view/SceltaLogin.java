@@ -14,6 +14,7 @@ public class SceltaLogin extends JPanel {
     private JButton adminButton;
     private JButton riderButton;
     private JButton clientButton;
+    private JButton informationButton;
     private MainView mainView;
 
     public SceltaLogin(final MainView mainView){
@@ -23,6 +24,7 @@ public class SceltaLogin extends JPanel {
         this.adminButton = new JButton("ADMIN");
         this.clientButton = new JButton("CLIENT");
         this.riderButton = new JButton("RIDER");
+        this.informationButton = new JButton("INFORMAZIONI AGGREGATE");
 
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -36,6 +38,8 @@ public class SceltaLogin extends JPanel {
         this.add(clientButton, gbc);
         gbc.gridx = 0; gbc.gridy = 2;
         this.add(riderButton, gbc);
+        gbc.gridx = 0; gbc.gridy = 3;
+        this.add(informationButton, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
 
@@ -62,10 +66,34 @@ public class SceltaLogin extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 mainView.requestChangePanel("admin", "scelta");
             }
 
         });
+
+        this.informationButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object[] scelte = {"ClassificaProdottiPiuVenduti", "MiglioriRider", "RecensioniNegative"};
+
+                    int response = javax.swing.JOptionPane.showOptionDialog(
+                        null,
+                        "Cosa vuoi visualizzare?",
+                        "Informazioni aggregate",
+                        javax.swing.JOptionPane.DEFAULT_OPTION,
+                        javax.swing.JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        scelte,
+                        scelte[0]
+                    );
+
+                    mainView.requestInformazioniAggregate(scelte[response].toString());
+                }
+
+
+            });
 
     }
 

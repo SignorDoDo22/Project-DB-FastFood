@@ -168,7 +168,16 @@ public class Cliente {
             return nextCodiceRider;
         }
 
+         public static boolean checkEmailExists(Connection connection, String email) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_CLIENT_EMAIL.get(), email);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
 
+                return resultSet.next();
+
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel controllo dell'esistenza dell'email del cliente", e);
+            }
+        }
 
     }
 }

@@ -31,6 +31,7 @@ public class CreaCategoria extends JDialog {
         this.add(nomeCategoriaLabel, gbc);
         gbc.gridx = 1; gbc.gridy = 0;
         this.nomeCategoriaField = new JFormattedTextField();
+        this.nomeCategoriaField.setColumns(20);
         this.add(nomeCategoriaField, gbc);
         gbc.gridx = 0; gbc.gridy = 1;
         this.creaCategoriaButton = new JButton("Crea Categoria");
@@ -40,10 +41,19 @@ public class CreaCategoria extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                controller.createCategoria(nomeCategoriaField.getText());
             }
 
         });
 
+    }
+
+    public void showErrorMessage(String message) {
+        javax.swing.JOptionPane.showMessageDialog(this, message, "Errore", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showSuccessMessage(String message) {
+        javax.swing.JOptionPane.showMessageDialog(this, message, "Successo", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        this.setVisible(false);
     }
 }

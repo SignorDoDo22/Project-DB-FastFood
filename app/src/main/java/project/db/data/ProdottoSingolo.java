@@ -73,6 +73,46 @@ public class ProdottoSingolo extends Prodotto {
             }
         }
 
+         public static void eliminaProdottoSingolo(final Connection connection, final String codiceProdotto) {
+            try {
+                connection.setAutoCommit(false);
+
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_RICETTA.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO_SINGOLO.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO.get())) {
+                    stmt.setString(1, codiceProdotto);
+                    stmt.executeUpdate();
+                }
+
+                connection.commit();
+
+            } catch (SQLException e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
+                throw new DAOException("Errore durante l'eliminazione del prodotto", e);
+
+            } finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
 }

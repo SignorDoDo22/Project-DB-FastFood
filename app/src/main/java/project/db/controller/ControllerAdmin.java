@@ -48,6 +48,10 @@ public class ControllerAdmin {
         this.createIngredientePanel.setVisible(true);
     }
 
+    public void userRequestCreateCategoriaPanel() {
+        this.creaCategoriaPanel.setVisible(true);
+    }
+
 
     public void userRequestedCatalogo() {
         try {
@@ -83,6 +87,33 @@ public class ControllerAdmin {
 
     public void userRequestedEliminazione(final String codiceProdotto) {
         try {
+
+            if(this.modelReading.isProdottoMenu(codiceProdotto)){
+                System.out.println("Il prodotto con codice " + codiceProdotto + " è un menu, procedo con l'eliminazione dal menu.");
+                if (this.modelReading.isProdottoOrdinato(codiceProdotto)) {
+                    boolean vuoleSoftDelete = adminPanel.chiediSoftDelete(
+                        "Questo prodotto e' gia' stato ordinato in passato, non puo' essere eliminato. "
+                        + "Vuoi renderlo non disponibile invece?");
+                    if (vuoleSoftDelete) {
+                        this.writingModel.rendiNonDisponibile(codiceProdotto);
+                        adminPanel.mostraMessaggio("Prodotto reso non disponibile.");
+                        userRequestedCatalogo();
+                    }
+                    return;
+                }
+
+                if(this.writingModel.eliminaProdottoDalMenu(codiceProdotto) && this.writingModel.eliminaMenu(codiceProdotto)){
+                    adminPanel.mostraMessaggio("Prodotto eliminato dal menu.");
+                    userRequestedCatalogo();
+                } else {
+                    adminPanel.mostraErrore("Errore durante l'eliminazione del prodotto dal menu.");
+                }
+
+                return;
+
+            }
+
+
             if (this.modelReading.isProdottoOrdinato(codiceProdotto)) {
                 boolean vuoleSoftDelete = adminPanel.chiediSoftDelete(
                         "Questo prodotto e' gia' stato ordinato in passato, non puo' essere eliminato. "
@@ -180,7 +211,6 @@ public class ControllerAdmin {
         this.createProdottoPanel.caricaCategoriePossibili(modelReading.loadCategorie());
     }
 
-
     public boolean createMenu(){
 
         Map<String, Integer> prodottiSelezionati = this.createMenuPanel.getProdottiSelezionati();
@@ -194,8 +224,8 @@ public class ControllerAdmin {
             return false;
         }
 
-        if (quantitaTotale > 10){
-            adminPanel.mostraErrore("Non puoi selezionare piu' di 10 prodotti per creare un menu.");
+        if (quantitaTotale > 4){
+            adminPanel.mostraErrore("Non puoi selezionare piu' di 4 prodotti per creare un menu.");
             return false;
         }
 
@@ -249,6 +279,24 @@ public class ControllerAdmin {
         } else {
             adminPanel.mostraErrore("Errore durante la creazione del prodotto singolo.");
             return false;
+        }
+    }
+
+    public void createCategoria(String nomeCategoria) {
+
+        if(this.modelReading.checkCategoriaExists(nomeCategoria)){
+            adminPanel.mostraErrore("La categoria con nome " + nomeCategoria + " esiste gia'.");
+            return;
+        }
+
+
+        if(writingModel.createCategoria(nomeCategoria)){
+            adminPanel.mostraMessaggio("Categoria creata con successo.");
+            this.creaCategoriaPanel.setVisible(false);
+
+        } else {
+            adminPanel.mostraErrore("Errore durante la creazione della categoria.");
+
         }
     }
 

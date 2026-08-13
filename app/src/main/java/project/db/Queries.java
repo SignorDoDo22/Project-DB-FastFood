@@ -27,8 +27,11 @@ public enum Queries {
     GET_LAST_INGREDIENTE("""
             SELECT Codice_Ingrediente FROM Ingrediente ORDER BY Codice_Ingrediente DESC LIMIT 1
             """),
+    GET_LAST_CATEGORIA("""
+            SELECT IDCategoria FROM Categoria ORDER BY IDCategoria DESC LIMIT 1
+            """),
 
-        GET_CATEGORIA_BY_NAME("""
+    GET_CATEGORIA_BY_NAME("""
             SELECT IDCategoria FROM Categoria WHERE Nome = ?
             """),
 
@@ -116,18 +119,24 @@ public enum Queries {
             where rider.Email = ? and rider.Password = ?
             """),
 
+    CERCA_CLIENT_EMAIL("""
+            select *
+            from cliente
+            where cliente.Email = ?
+            """),
+
+    CERCA_RIDER_EMAIL("""
+            select *
+            from rider
+            where rider.Email = ?
+            """),
+
     MOSTRA_CLIENTI("""
             SELECT * FROM Cliente
             """),
 
     CERCA_CLIENTE_PER_Email("""
             SELECT * FROM Cliente WHERE Email = ? AND Password = ?
-            """),
-
-
-    AGGIORNA_NUM_ORDINI_CLIENTE("""
-            UPDATE Cliente SET NumOrdiniEffetuati = NumOrdiniEffetuati + 1
-            WHERE Codice_Utente = ?
             """),
 
     INSERIRE_RIDER("""
@@ -155,11 +164,6 @@ public enum Queries {
             SELECT Codice_Rider FROM Rider ORDER BY Codice_Rider DESC LIMIT 1
             """),
 
-    AGGIORNA_ORDINI_CONSEGNATI_RIDER("""
-            UPDATE Rider SET Ordini_Totali_Consegnati = Ordini_Totali_Consegnati + 1
-            WHERE Codice_Rider = ?
-            """),
-
     AGGIORNA_GUADAGNO_TOTALE_RIDER("""
             UPDATE Rider
             SET GuadagnoTotale = GuadagnoTotale + ?
@@ -176,11 +180,39 @@ public enum Queries {
             SELECT Codice_Rider FROM Rider ORDER BY Codice_Rider DESC LIMIT 1
             """),
 
+     INSERIRE_DENTRO_ORDINE_RIDER("""
+            UPDATE Ordine
+            SET Codice_Rider = ?
+            WHERE Codice_Ordine = ?
+            """),
+
 
 
     // =================================================
     // PRODOTTO (+ Singolo/Menu)
     // =================================================
+
+    PRODOTTI_MIGLIORI_CLASSIFICA("""
+                SELECT p.Codice_Prodotto,
+                p.Nome_Prodotto,
+                COALESCE(vs.Tot_Singolo, 0) + COALESCE(vm.Tot_Menu, 0) AS Totale_Venduto
+                FROM Prodotto p
+                LEFT JOIN (
+                SELECT Codice_Prodotto, COUNT(*) AS Tot_Singolo
+                FROM rigaprodottosingolo
+                GROUP BY Codice_Prodotto
+                ) vs ON p.Codice_Prodotto = vs.Codice_Prodotto
+                LEFT JOIN (
+                SELECT Codice_Prodotto, COUNT(*) AS Tot_Menu
+                FROM rigaprodottomenu
+                GROUP BY Codice_Prodotto
+                ) vm ON p.Codice_Prodotto = vm.Codice_Prodotto
+                ORDER BY Totale_Venduto DESC
+                LIMIT 5;
+
+            """),
+
+
 
     TROVA_MENU_CHE_CONTENGONO_PRODOTTO("""
             SELECT m.Codice_Prodotto, p.Nome_Prodotto
@@ -273,7 +305,9 @@ public enum Queries {
     GET_CODICE_PRODOTTO_BY_NAME("""
             SELECT Codice_Prodotto FROM Prodotto WHERE Nome_Prodotto = ?
             """),
-
+    IS_PRODOTTO_MENU("""
+            SELECT 1 FROM Menu WHERE Codice_Prodotto = ?
+            """),
 
 
 
@@ -311,7 +345,7 @@ public enum Queries {
             """),
 
     ELIMINA_DA_COMPOSTO_MENU("""
-            DELETE FROM CompostoMenu WHERE Codice_Prodotto = ?
+            DELETE FROM CompostoMenu WHERE Codice_Menu = ?
             """),
 
     ELIMINA_RICETTA("""
@@ -323,20 +357,22 @@ public enum Queries {
     // ORDINE
     // =================================================
 
+    INSERIRE_STATO_ORDINE("""
+            INSERT INTO Stato_Ordine (Codice_Ordine, Stato, Data, Tempo)
+            VALUES (?, ?, ?, ?)
+            """),
+
+    MOSTRA_STATO_ORDINE("""
+                SELECT * FROM Stato_Ordine WHERE Codice_Ordine = ?
+                """),
+
     INSERIRE_ORDINE("""
-            INSERT INTO Ordine (Prezzo_totale, DataCreazione, Ind_Via, Ind_Citta, Ind_Civico, Codice_Ordine, Codice_Utente)
-            VALUES (?,?,?,?,?,?,?,?,?,?)
+            INSERT INTO Ordine ( DataCreazione, Ind_Via, Ind_Citta, Ind_Civico, Codice_Ordine, Codice_Utente)
+            VALUES (?,?,?,?,?,?)
             """),
 
     MOSTRA_ORDINI("""
             SELECT * FROM Ordine
-            """),
-
-    MOSTRA_ORDINI_PRONTI("""
-                SELECT *
-                FROM stato_ordine
-                INNER JOIN ordine ON ordine.Codice_Ordine = stato_ordine.Codice_Ordine
-                WHERE stato_ordine.Stato = 'Pronto' AND ordine.Codice_Rider IS NULL;
             """),
 
     CERCA_ORDINE_PER_CODICE("""
@@ -361,18 +397,59 @@ public enum Queries {
             ORDER BY o.DataCreazione DESC
             """),
 
-    // =================================================
-    // PRENDE_IN_CARICO
-    // =================================================
-
-    INSERIRE_PRENDE_IN_CARICO("""
-            INSERT INTO Prende_in_carico (Codice_Ordine, Compenso_Rider, Codice_Utente)
-            VALUES (?, ?, ?)
+    MOSTRA_ULTIMO_ORDINE_CODICE("""
+            SELECT Codice_Ordine FROM Ordine ORDER BY Codice_Ordine DESC LIMIT 1
             """),
 
-    TROVA_RIDER_DELLA_CONSEGNA("""
-            SELECT Codice_Utente FROM Prende_in_carico WHERE Codice_Ordine = ?
+    MOSTRA_ORDINI_PRONTI("""
+            SELECT *
+                FROM ordine
+                INNER JOIN stato_ordine ON stato_ordine.Codice_Ordine = ordine.Codice_Ordine
+                WHERE stato_ordine.Stato = 'Pronto'
+                AND NOT EXISTS (
+                SELECT 1
+                FROM stato_ordine so2
+                WHERE so2.Codice_Ordine = ordine.Codice_Ordine
+                AND so2.Stato IN ('Consegnato', 'In Consegna')
+                )
             """),
+
+    MOSTRA_ORDINI_IN_PREPARAZIONE("""
+            SELECT *
+                FROM ordine
+                INNER JOIN stato_ordine ON stato_ordine.Codice_Ordine = ordine.Codice_Ordine
+                WHERE stato_ordine.Stato = 'In Preparazione'
+                AND NOT EXISTS (
+                SELECT 1
+                FROM stato_ordine so2
+                WHERE so2.Codice_Ordine = ordine.Codice_Ordine
+                AND so2.Stato IN ('Consegnato', 'In Consegna', 'Pronto')
+                )
+            """),
+
+   INSERIRE_PRIMA_STATO_ORDINE("""
+            INSERT INTO Stato_Ordine (Codice_Ordine, Stato, Data, Tempo)
+            VALUES (?, 'In Preparazione', ?, ?)
+            """),
+   AGGIORNA_ORDINE_PRONTO("""
+            UPDATE Stato_Ordine
+            SET Stato = 'Pronto'
+            WHERE Codice_Ordine = ?
+            AND Stato = 'In Preparazione'
+            """),
+   AGGIORNA_ORDINE_IN_CONSEGNA("""
+            UPDATE Stato_Ordine
+            SET Stato = 'In Consegna'
+            WHERE Codice_Ordine = ?
+            AND Stato = 'Pronto'
+            """),
+   AGGIORNA_ORDINE_CONSEGNATO("""
+            UPDATE Stato_Ordine
+            SET Stato = 'Consegnato'
+            WHERE Codice_Ordine = ?
+            AND Stato = 'In Consegna'
+            """),
+
 
 
     // =================================================
@@ -410,8 +487,8 @@ public enum Queries {
     // =================================================
 
     INSERIRE_COMPONENTE_MENU_ORDINATO("""
-            INSERT INTO ComponenteMenuOrdinato (Codice_Ordine, CodiceRiga, NumRowCompMenu)
-            VALUES (?, ?, ?)
+            INSERT INTO ComponenteMenuOrdinato (Codice_Ordine, CodiceRiga, NumRowCompMenu, Codice_Prodotto)
+            VALUES (?, ?, ?, ?)
             """),
 
     INSERIRE_RIFERISCE_COMP_MENU("""
@@ -464,6 +541,12 @@ public enum Queries {
     // =================================================
     // RECENSIONE
     // =================================================
+
+    MOSTRA_RECENSIONI_NEGATIVE("""
+            SELECT r.Codice_Ordine, r.Testo_Recensione, r.Voto_Ordine, r.Voto_Rider
+            FROM Recensione r
+            WHERE r.Voto_Ordine < 3 OR r.Voto_Rider < 3
+            """),
 
     INSERIRE_RECENSIONE("""
             INSERT INTO Recensione (Codice_Ordine, Voto_Rider, Testo_Recensione, Voto_Ordine)

@@ -81,7 +81,9 @@ public class Categoria {
             return null;
         }
 
-        public boolean insert(final Connection connection, final String nomeCategoria, final String idCategoria) {
+        public boolean insert(final Connection connection, final String nomeCategoria) {
+
+            String idCategoria = getProssimoCodice(connection, "CAT", 2);
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_CATEGORIA.get(), nomeCategoria, idCategoria)) {
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
@@ -89,6 +91,47 @@ public class Categoria {
             }
             return true;
         }
+
+         public static String getLast(Connection connection){
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_CATEGORIA.get())) {
+                try (var resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("IDCategoria");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero dell'ultima categoria", e);
+            }
+            return null;
+        }
+
+        public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
+            String ultimoCodice = getLast(connection);
+
+            int numero;
+            if (ultimoCodice == null || ultimoCodice.isBlank()) {
+                numero = 1;
+            } else {
+                String codiceTrim = ultimoCodice.trim();
+                String parteNumerica = codiceTrim.substring(prefisso.length());
+                numero = Integer.parseInt(parteNumerica) + 1;
+            }
+
+            System.out.println("Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
+            return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
+        }
+
+        public static boolean checkNameCategoriaExists(Connection connection, String nomeCategoria) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.GET_CATEGORIA_BY_NAME.get(), nomeCategoria);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                return resultSet.next();
+
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel controllo dell'esistenza del nome della categoria", e);
+            }
+        }
+
     }
 
 

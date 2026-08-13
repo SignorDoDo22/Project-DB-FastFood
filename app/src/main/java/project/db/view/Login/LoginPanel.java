@@ -17,7 +17,6 @@ import project.db.controller.ControllerLogin;
 
 public class LoginPanel extends JPanel {
 
-    private JTextField name;
     private JPasswordField password;
     private JTextField email;
     private JPanel panelInterno;
@@ -38,7 +37,7 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
 
-        this.name = new JTextField(15);       // 15 colonne = dimensione ragionevole
+        // this.name = new JTextField(15);       // 15 colonne = dimensione ragionevole
         this.password = new JPasswordField(15);
         this.email = new JTextField(15);
         this.indietroButton = new JButton("Indietro");
@@ -67,9 +66,6 @@ public class LoginPanel extends JPanel {
         gbc.gridx = 0; gbc.gridy = 5;
         panelInterno.add(loginButton, gbc);
 
-        // Aggiungendo panelInterno al CENTER, GridBagLayout dentro di lui
-        // centra automaticamente il "blocco" di componenti nello spazio disponibile,
-        // senza stirare i singoli campi
         this.add(panelInterno, BorderLayout.CENTER);
 
         this.indietroButton.addActionListener(new ActionListener() {

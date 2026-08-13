@@ -60,7 +60,6 @@ public class Prodotto {
                 while (resultSet.next()) {
                     var disponibileTesto = resultSet.getString("Disponibile");
                     var disponibile = "S".equals(disponibileTesto);
-
                     var nome_prodotto = resultSet.getString("Nome_Prodotto");
                     var descrizione_prodotto = resultSet.getString("Descrizione_Prodotto");
                     var prezzo_Originario = resultSet.getFloat("Prezzo_originario");
@@ -142,48 +141,6 @@ public class Prodotto {
 
             return true;
         }
-
-
-        public static void eliminaProdottoSingolo(final Connection connection, final String codiceProdotto) {
-            try {
-                connection.setAutoCommit(false);
-
-                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get())) {
-                    stmt.setString(1, codiceProdotto);
-                    stmt.executeUpdate();
-                }
-                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_RICETTA.get())) {
-                    stmt.setString(1, codiceProdotto);
-                    stmt.executeUpdate();
-                }
-                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO_SINGOLO.get())) {
-                    stmt.setString(1, codiceProdotto);
-                    stmt.executeUpdate();
-                }
-                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO.get())) {
-                    stmt.setString(1, codiceProdotto);
-                    stmt.executeUpdate();
-                }
-
-                connection.commit();
-
-            } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackEx) {
-                    rollbackEx.printStackTrace();
-                }
-                throw new DAOException("Errore durante l'eliminazione del prodotto", e);
-
-            } finally {
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
 
         public static boolean isStatoOrdinato(final Connection connection, final String codiceProdotto) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.VERIFICA_PRODOTTO_ORDINATO.get())) {
@@ -290,6 +247,14 @@ public class Prodotto {
         }
 
 
+        public static boolean isProdottoMenu(final Connection connection, final String codiceProdotto) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.IS_PRODOTTO_MENU.get(), codiceProdotto);
+                 var resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel controllo se il prodotto è un menu", e);
+            }
+        }
 
     }
 }

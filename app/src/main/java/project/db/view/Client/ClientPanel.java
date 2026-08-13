@@ -1,7 +1,6 @@
 package project.db.view.Client;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,7 +62,7 @@ public class ClientPanel extends JPanel {
         this.pannelloInferiore.add(refreshRecensioniButton);
 
         this.pannelloInferiore.add(buttonIndietro);
-        this.pannelloInferiore.add(new JPanel());  // cella vuota centrale, per spaziatura
+        this.pannelloInferiore.add(new JPanel());
         this.pannelloInferiore.add(buttonProcedi);
         this.add(pannelloInferiore, BorderLayout.SOUTH);
 
@@ -71,8 +70,17 @@ public class ClientPanel extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                controllerClientPanel.logout();
                 mainView.requestChangePanel("scelta", "client");
 
+            }
+        });
+
+        this.buttonProcedi.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controllerClientPanel.setVisibleDomicilioPanel(true);
             }
         });
     }

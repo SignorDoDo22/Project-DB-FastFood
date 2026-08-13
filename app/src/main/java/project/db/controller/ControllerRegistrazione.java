@@ -75,6 +75,11 @@ public class ControllerRegistrazione {
             return;
         }
 
+        if(modelReading.checkEmailRiderExists(email)) {
+            registrationPanelRider.showErrorMessage("Utente già esistente");
+            return;
+        }
+
         if(modelReading.getRider(email, password) != null) {
             registrationPanelRider.showErrorMessage("Utente già esistente");
         }

@@ -1,13 +1,16 @@
 package project.db.model;
 import project.db.data.Categoria;
 import java.sql.Connection;
+import project.db.data.RigaOrdine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import project.db.data.Cliente;
+import project.db.data.InformazioniAggregate;
 import project.db.data.Ingrediente;
 import project.db.data.Ordine;
+import project.db.data.Pair;
 import project.db.data.Prodotto;
 import project.db.data.ProdottoMenu;
 import project.db.data.Recensione;
@@ -90,7 +93,35 @@ public class ReadingModel {
         return categorie;
     }
 
+    public Boolean isProdottoMenu(final String codiceProdotto) {
+        return Prodotto.DAO.isProdottoMenu(connection, codiceProdotto);
+    }
+
     public String getNextProdottoCode() {
         return Prodotto.DAO.getProssimoCodice(connection, "PR", 3);
+    }
+
+    public String getNextOrdineCode() {
+        return Ordine.DAO.getProssimoCodice(connection, "ORD", 3);
+    }
+
+    public String getNextRigaCode() {
+        return RigaOrdine.DAO.getNextCodiceRiga(connection, "RIG");
+    }
+
+    public boolean checkEmailRiderExists(final String email) {
+        return Rider.DAO.checkEmailExists(connection, email);
+    }
+
+    public boolean checkEmailClientExists(final String email) {
+        return Cliente.DAO.checkEmailExists(connection, email);
+    }
+
+    public boolean checkCategoriaExists(final String nomeCategoria) {
+        return Categoria.DAO.checkNameCategoriaExists(connection, nomeCategoria);
+    }
+
+    public Map<Pair<String,String>,Integer> getClassificaProdottiPiuVenduti() {
+        return InformazioniAggregate.DAO.getClassificaProdottiPiuVenduti(connection);
     }
 }

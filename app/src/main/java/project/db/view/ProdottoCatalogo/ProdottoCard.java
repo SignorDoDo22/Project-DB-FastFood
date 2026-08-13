@@ -78,22 +78,6 @@ public class ProdottoCard extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-        int scelta = JOptionPane.showConfirmDialog(
-                    null,
-                    "Vuoi modificare il prodotto selezionato?",
-                    "Conferma modifica",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
-
-            if (scelta != JOptionPane.YES_OPTION) {
-                return;
-            }else{
-
-
-
-            }
-
         // 2) Chiedo la quantità desiderata
         String input = JOptionPane.showInputDialog(
                 null,

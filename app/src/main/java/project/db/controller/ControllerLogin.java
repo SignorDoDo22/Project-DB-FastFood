@@ -39,6 +39,7 @@ public class ControllerLogin {
         System.out.println("Password: " + password);
         if(modelReading.findClient(email, password)){
             this.utente = modelReading.getCliente(email, password);
+            this.mainController.setClientLoggedIn(utente);
             this.mainView.requestChangePanel("client", "login");
         } else {
             System.out.println("Utente non trovato");
@@ -56,6 +57,7 @@ public class ControllerLogin {
         System.out.println("Password: " + password);
         if(modelReading.findRider(email, password)){
             this.rider = modelReading.getRider(email, password);
+            this.mainController.setRiderLoggedIn(rider);
             this.mainView.requestChangePanel("rider", "login");
         } else {
             this.rider = null;

@@ -2,6 +2,8 @@ package project.db.controller;
 
 import java.sql.Connection;
 
+import project.db.data.Cliente;
+import project.db.data.Rider;
 import project.db.model.ReadingModel;
 import project.db.model.WritingModel;
 import project.db.view.MainView;
@@ -17,6 +19,7 @@ public class MainController {
     private ControllerRider controllerRider;
     private final ControllerLogin controllerLogin;
     private final ControllerRegistrazione controllerRegistrazione;
+    private ControllerInformazioniAggregate controllerInformazioniAggregate;
 
     public MainController(final ReadingModel modelReading, final WritingModel writingModel, final Connection connection){
 
@@ -27,11 +30,12 @@ public class MainController {
 
         this.controllerLogin = new ControllerLogin(this, modelReading, writingModel);
         this.controllerClient = new ControllerClientPanel(modelReading, writingModel, mainView.getClientPanel(), this);
-        this.controllerRider = new ControllerRider(this, modelReading, mainView.getRiderPanel());
+        this.controllerRider = new ControllerRider(this, modelReading, writingModel, mainView.getRiderPanel());
         this.controllerRegistrazione = new ControllerRegistrazione(this, modelReading, writingModel);
         this.controllerAdmin = new ControllerAdmin(modelReading, writingModel, mainView.getAdminPanel());
 
         this.mainView.getRiderPanel().setControllerRider(this.controllerRider);
+        this.controllerInformazioniAggregate = new ControllerInformazioniAggregate(modelReading);
         this.mainView.setVisible(true);
     }
 
@@ -80,6 +84,29 @@ public class MainController {
 
         System.out.println("panelName: " + panelName);
         System.out.println("currentPanel: " + currentPanel);
+    }
+
+    public void changePanelInformazioniAggregate(final String panelName) {
+        if("MiglioriRider".equals(panelName)) {
+            controllerInformazioniAggregate.showMiglioriRider();
+        }
+
+        if("RecensioniNegative".equals(panelName)) {
+            controllerInformazioniAggregate.showRecensioniNegative();
+        }
+
+        if("ClassificaProdottiPiuVenduti".equals(panelName)) {
+            controllerInformazioniAggregate.showClassificaProdottiPiuVenduti();
+        }
+    }
+
+
+    public void setClientLoggedIn(final Cliente cliente) {
+        this.controllerClient.setUtenteLoggato(cliente);
+    }
+
+    public void setRiderLoggedIn(final Rider rider) {
+        this.controllerRider.setRiderLoggato(rider);
     }
 
 

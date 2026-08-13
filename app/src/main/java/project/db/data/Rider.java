@@ -165,19 +165,6 @@ public class Rider {
             }
         }
 
-
-        public static void aggiornaGuadagnoTotale(float guadagno, Connection connection, String codiceRider) {
-            try (PreparedStatement preparedStatement =
-                        DAOUtils.prepare(connection, Queries.AGGIORNA_GUADAGNO_TOTALE_RIDER.get())) {
-                preparedStatement.setFloat(1, guadagno);
-                preparedStatement.setString(2, codiceRider);
-                preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-        }
-
         public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
             String ultimoCodice = getNextCodiceRider(connection);
 
@@ -209,25 +196,58 @@ public class Rider {
 
 
 
-        public static void aggiornaRaitingMedio(int raiting) {
-            return;
+        public static void aggiornaRaitingMedio(String codice_rider, int raiting, Connection connection) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_MEDIA_RIDER.get())) {
+                preparedStatement.setString(1, codice_rider);
+                preparedStatement.setString(2, codice_rider);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public static void aggiornaGuadagno(float guadagno, Connection connection, String codiceRider) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_GUADAGNO_TOTALE_RIDER.get())) {
+                preparedStatement.setFloat(1, guadagno);
+                preparedStatement.setString(2, codiceRider);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         public static void riderPrendeInCaricoOrdine(String codiceRider, String codiceOrdine, Connection connection) {
-            return;
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_DENTRO_ORDINE_RIDER.get())) {
+                preparedStatement.setString(1, codiceRider);
+                preparedStatement.setString(2, codiceOrdine);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         public static String getLast(Connection connection){
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_RIDER_CODICE.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        return resultSet.getString("Codice_Utente");
+                        return resultSet.getString("Codice_Rider");
                     }
                 }
             } catch (SQLException e) {
                 throw new DAOException("Errore nel recupero del codice dell'ultimo rider", e);
             }
             return null;
+        }
+
+        public static boolean checkEmailExists(Connection connection, String email) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER_EMAIL.get(), email);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                return resultSet.next();
+
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel controllo dell'esistenza dell'email del rider", e);
+            }
         }
 
     }

@@ -43,6 +43,11 @@ public class MainView extends JFrame {
        this.mainController.changePanel(panelName, currentPanel);
     }
 
+     public void requestInformazioniAggregate(final String infoType) {
+        System.out.println("Requesting Informazioni Aggregate for type: " + infoType);
+        this.mainController.changePanelInformazioniAggregate(infoType);
+    }
+
     public void changePanel(final String panelName){
         this.cardLayout.show(this.getContentPane(), panelName);
         this.currentPanel = panelName;

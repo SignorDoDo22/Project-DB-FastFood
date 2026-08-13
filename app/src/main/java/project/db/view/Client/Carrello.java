@@ -19,7 +19,6 @@ public class Carrello extends JPanel {
     private JPanel panelscorrevole;
     private ClientPanel clientPanel;
     private JLabel carrelloString;
-    private JLabel totaleString;
     private JButton buttonProcedi;
     private ControllerClientPanel controllerClientPanel;
     private List<RigaCarrello> righeCarrello = new ArrayList<>();
@@ -29,7 +28,6 @@ public class Carrello extends JPanel {
         this.clientPanel = clientPanel;
         this.setLayout(new BorderLayout());
         this.carrelloString = new JLabel("CART");
-        this.totaleString = new JLabel("TOTALE: ");
         this.add(carrelloString, BorderLayout.NORTH);
 
         this.clientPanel = clientPanel;
@@ -37,7 +35,6 @@ public class Carrello extends JPanel {
         this.panelscorrevole.setLayout(new BoxLayout(panelscorrevole, BoxLayout.Y_AXIS));
         this.scrollPanel = new JScrollPane(panelscorrevole);
         this.add(scrollPanel, BorderLayout.CENTER);
-        this.add(totaleString, BorderLayout.SOUTH);
 
     }
 
@@ -54,8 +51,39 @@ public class Carrello extends JPanel {
         controllerClientPanel.userRequestIngredientiFromRigaCarrello(rigaCarrello.getCodiceProdotto(), rigaCarrello);
     }
 
+    /**
+     * Richiede al controller la composizione del menu (nome componente -> suoi
+     * ingredienti) associato a questa riga carrello, così l'utente può scegliere
+     * quale prodotto del menu modificare.
+     */
+    public void requestComponentiMenu(final RigaCarrello rigaCarrello) {
+        controllerClientPanel.userRequestComponentiMenu(rigaCarrello.getCodiceProdotto(), rigaCarrello);
+    }
+
+    /**
+     * Restituisce i nomi di tutti gli ingredienti disponibili a catalogo,
+     * usati per popolare la sezione "aggiungi ingrediente".
+     */
+    public List<String> requestIngredientiDisponibili() {
+        return controllerClientPanel.userRequestIngredientiDisponibili();
+    }
+
     public List<RigaCarrello> getRigheCarrello() {
         return righeCarrello;
+    }
+
+    public void rimuoviProdottoCarrello(RigaCarrello rigaCarrello) {
+        this.panelscorrevole.remove(rigaCarrello);
+        righeCarrello.remove(rigaCarrello);
+        this.revalidate();
+        this.repaint();
+    }
+
+    public void svuotaCarrello() {
+        this.panelscorrevole.removeAll();
+        righeCarrello.clear();
+        this.revalidate();
+        this.repaint();
     }
 
 }

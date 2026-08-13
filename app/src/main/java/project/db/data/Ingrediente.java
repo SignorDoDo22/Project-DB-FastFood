@@ -156,7 +156,6 @@ public class Ingrediente {
         public static Map<String, Integer> getIngredientiWithQuantita(final Connection connection, final String codiceProdotto) {
 
             Map<String, Integer> listaIngredienti = new HashMap<>();
-            System.out.println("PRODOTTO: Recupero ingredienti per prodotto: " + codiceProdotto);
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INGREDIENTI_CONTENUTI_Quantita.get())) {
                 preparedStatement.setString(1, codiceProdotto);
 
@@ -175,10 +174,6 @@ public class Ingrediente {
 
         public static List<String> getIngredienti(final Connection connection, final String codiceProdotto) {
 
-            if (!check(connection, codiceProdotto)) {
-                return new ArrayList<>();
-            }
-
             List<String> listaIngredienti = new ArrayList<>();
 
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INGREDIENTI_CONTENUTI.get())) {
@@ -186,6 +181,7 @@ public class Ingrediente {
 
                 try (var result = preparedStatement.executeQuery()) {
                     while (result.next()) {
+                        System.out.println("PRODOTTO: Ingrediente trovato: " + result.getString("nome_ingrediente"));
                         listaIngredienti.add(result.getString("nome_ingrediente"));
                     }
                 }

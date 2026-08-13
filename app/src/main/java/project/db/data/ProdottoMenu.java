@@ -101,6 +101,32 @@ public class ProdottoMenu extends Prodotto {
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
         }
 
+        public static boolean eliminaComprendeMenu(final Connection connection, final String codiceMenu) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get(), codiceMenu)) {
+                int rowsAffected = preparedStatement.executeUpdate();
+                System.out.println("PRODOTTO ELIMINA COMPRENDE: Eliminazione menu con codice: " + codiceMenu + ", " + rowsAffected + " righe interessate.");
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                throw new DAOException("Errore durante l'eliminazione del menu", e);
+            }
+        }
 
+        public static boolean eliminaMenu(final Connection connection, final String codiceMenu) {
+
+            try {
+
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_MENU.get())) {
+                    stmt.setString(1, codiceMenu);
+                    stmt.executeUpdate();
+                }
+                try (var stmt = DAOUtils.prepare(connection, Queries.ELIMINA_PRODOTTO.get())) {
+                    stmt.setString(1, codiceMenu);
+                    stmt.executeUpdate();
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore durante l'eliminazione del menu", e);
+            }
+            return true;
+        }
     }
 }

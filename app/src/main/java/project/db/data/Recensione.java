@@ -51,7 +51,7 @@ public class Recensione {
             return listRecensioni;
         }
 
-        public static boolean insert(Connection connection, Recensione recensione) {
+        public static boolean insert(Connection connection, Recensione recensione, String codiceRider) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_RECENSIONE.get())) {
                 preparedStatement.setString(1, recensione.codice_Recensione);
                 preparedStatement.setString(2, recensione.codice_Ordine);
@@ -60,10 +60,16 @@ public class Recensione {
                 preparedStatement.setInt(5, recensione.voto_Prodotto);
 
                 int rowsAffected = preparedStatement.executeUpdate();
-                return rowsAffected > 0;
+
+                if(rowsAffected > 0){
+                    Rider.DAO.aggiornaRaitingMedio(codiceRider, recensione.voto_Rider, connection);
+                }
+
             } catch (Exception e) {
                 throw new DAOException("Errore durante l'inserimento della recensione", e);
             }
+
+            return true;
         }
     }
 

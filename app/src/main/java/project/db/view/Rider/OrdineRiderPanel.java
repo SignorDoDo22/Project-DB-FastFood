@@ -3,10 +3,6 @@ package project.db.view.Rider;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import project.db.data.Ordine;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -14,16 +10,22 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import project.db.controller.ControllerRider;
+
 public class OrdineRiderPanel extends JPanel {
 
     private final JButton prendiInCaricoButton;
     private final JButton consegnaButton;
-    private final Ordine ordine;
+    private final String codiceOrdine;
+    private final String via;
+    private final String civico;
+    private ControllerRider controller;
 
-    public OrdineRiderPanel(Ordine ordine) {
-
-        this.ordine = ordine;
-
+    public OrdineRiderPanel(ControllerRider controller, String codiceOrdine, String via, String civico) {
+        this.codiceOrdine = codiceOrdine;
+        this.via = via;
+        this.civico = civico;
+        this.controller = controller;
 
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createCompoundBorder(
@@ -33,8 +35,7 @@ public class OrdineRiderPanel extends JPanel {
         this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
 
         JLabel indirizzoLabel = new JLabel(
-                String.format("Ordine %s - %s, %s (%s)", ordine.getCodiceOrdine(),
-                ordine.getIndVia(), ordine.getIndCivico(), ordine.getIndCitta()));
+                String.format("Ordine %s - %s, %s", codiceOrdine, via, civico));
         this.add(indirizzoLabel, BorderLayout.WEST);
 
         JPanel azionePanel = new JPanel();
@@ -44,22 +45,23 @@ public class OrdineRiderPanel extends JPanel {
         azionePanel.add(consegnaButton);
         this.add(azionePanel, BorderLayout.EAST);
 
-        this.prendiInCaricoButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-
+        this.prendiInCaricoButton.addActionListener(e -> {
+            controller.riderPrendeInCarico(this);
         });
 
+        this.consegnaButton.addActionListener(e -> {
+            controller.riderCompletaConsegna(this);
+        });
     }
 
-    public JButton getPrendiInCaricoButton() {
-        return prendiInCaricoButton;
+
+    public void setEnable(boolean enabled) {
+        this.prendiInCaricoButton.setEnabled(enabled);
+        this.consegnaButton.setEnabled(enabled);
     }
 
-    public JButton getConsegnaButton() {
-        return consegnaButton;
+    public String getCodiceOrdine() {
+        return codiceOrdine;
     }
+
 }

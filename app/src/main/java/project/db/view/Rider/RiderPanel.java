@@ -42,12 +42,12 @@ public class RiderPanel extends JPanel {
         this.buttonIndietro.addActionListener(e -> mainView.changePanel("scelta"));
     }
 
-    public void showOrdersReady(List<Ordine> ordini) {
+    public void showOrdersReady(List<OrdineRiderPanel> ordini) {
         panelInterno.removeAll();
-        for (Ordine ordine : ordini) {
-            OrdineRiderPanel ordineRiderPanel = new OrdineRiderPanel(ordine);
-            panelInterno.add(ordineRiderPanel);
+        for (OrdineRiderPanel ordinePanel : ordini) {
+            panelInterno.add(ordinePanel);
         }
+
         panelInterno.revalidate();
         panelInterno.repaint();
     }
