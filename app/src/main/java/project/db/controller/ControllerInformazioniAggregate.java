@@ -19,11 +19,11 @@ public class ControllerInformazioniAggregate {
     }
 
     public void showMiglioriRider() {
-        miglioriRider.setVisible(true);
+        miglioriRider.mostraClassifica(modelReading.getClassificaMiglioriRider());
     }
 
     public void showRecensioniNegative() {
-        recensioniNegative.setVisible(true);
+       recensioniNegative.mostraRecensioniNegative(modelReading.getRecensioniNegative());
     }
 
     public void showClassificaProdottiPiuVenduti() {

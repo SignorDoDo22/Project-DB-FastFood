@@ -2,39 +2,35 @@ package project.db.view.InformazioniAggregate;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.Map;
+import project.db.data.Pair;
 
 public class RecensioniNegative extends JDialog {
 
     public RecensioniNegative() {
         this.setTitle("Recensioni Negative");
         this.setSize(400, 300);
-        this.setModal(true); // blocca l'interazione con la finestra sottostante
-        this.setLocationRelativeTo(null); // centra sullo schermo
+        this.setModal(true);
+        this.setLocationRelativeTo(null);
     }
 
-    public void mostraRecensioniNegative(List<String> recensioni, Map<String, Integer> punteggi) {
+    public void mostraRecensioniNegative(Map<Pair<String,String>,Pair<Integer,Integer>> recensioniNegative) {
 
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Ultime recensioni negative:\n\n");
-
-        if (recensioni.isEmpty()) {
-            sb.append("Nessuna recensione negativa trovata.");
-        } else {
-            int rank = 1;
-            for (String recensione : recensioni) {
-                sb.append(rank).append(". ").append(recensione).append("\n");
-                rank++;
-            }
+        sb.append("Recensioni negative:\n\n");
+        for (Map.Entry<Pair<String,String>,Pair<Integer,Integer>> entry : recensioniNegative.entrySet()) {
+            Pair<String,String> prodottoKey = entry.getKey();
+            Pair<Integer,Integer> prodottoStats = entry.getValue();
+            sb.append("- ").append(prodottoKey.getFirst()).append(" ").append(prodottoKey.getSecond())
+              .append(" (Voto Ordine: ").append(prodottoStats.getFirst())
+              .append(", Voto Rider: ").append(prodottoStats.getSecond()).append(")\n");
         }
-
         textArea.setText(sb.toString());
 
         this.add(new JScrollPane(textArea), BorderLayout.CENTER);
-        this.setVisible(true); // mostra IL TUO dialog, non uno di JOptionPane
+        setVisible(true);
     }
 }

@@ -20,7 +20,7 @@ public class Ingrediente {
     private String codiceIngrediente;
 
     public Ingrediente(Boolean vegano, Boolean senzaGlutine, Boolean senzaLattosio,
-        String nomeIngrediente, String codiceIngrediente){
+            String nomeIngrediente, String codiceIngrediente) {
         this.vegano = vegano;
         this.senzaGlutine = senzaGlutine;
         this.nomeIngrediente = nomeIngrediente;
@@ -50,12 +50,12 @@ public class Ingrediente {
 
     public static class DAO {
 
-        public static List<Ingrediente> list(Connection connection){
+        public static List<Ingrediente> list(Connection connection) {
 
             List<Ingrediente> ingredienti = new ArrayList<>();
-            try(
-                var statement = DAOUtils.prepare(connection, Queries.MOSTRA_INGREDIENTI.get());
-                var setResult = statement.executeQuery();){
+            try (
+                    var statement = DAOUtils.prepare(connection, Queries.MOSTRA_INGREDIENTI.get());
+                    var setResult = statement.executeQuery();) {
 
                 while (setResult.next()) {
                     var senzaLattosio = setResult.getBoolean("Lattosio");
@@ -64,7 +64,8 @@ public class Ingrediente {
                     var nomeIngrediente = setResult.getString("Nome_Ingrediente");
                     var senzaGlutine = setResult.getBoolean("Glutine");
 
-                    Ingrediente ingrediente = new Ingrediente(vegano, senzaGlutine, senzaLattosio, nomeIngrediente, codiceIngrediente);
+                    Ingrediente ingrediente = new Ingrediente(vegano, senzaGlutine, senzaLattosio, nomeIngrediente,
+                            codiceIngrediente);
                     ingredienti.add(ingrediente);
                 }
 
@@ -81,7 +82,7 @@ public class Ingrediente {
          * FIX: prima il parametro codiceIngrediente non veniva mai passato alla query
          * (mancava il setString), quindi il placeholder "?" restava non valorizzato.
          */
-        public static boolean check(Connection connection, String codiceIngrediente){
+        public static boolean check(Connection connection, String codiceIngrediente) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.TROVA_INGREDIENTE.get())) {
                 preparedStatement.setString(1, codiceIngrediente);
                 try (var resultSet = preparedStatement.executeQuery()) {
@@ -107,12 +108,12 @@ public class Ingrediente {
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
         }
 
-
-        public static boolean insert(final Connection connection, final String nomeIngrediente, final Map<String, Boolean> ingredientiPresentiCheckBox) {
+        public static boolean insert(final Connection connection, final String nomeIngrediente,
+                final Map<String, Boolean> ingredientiPresentiCheckBox) {
 
             System.out.println("PRODOTTO: Inserimento ingrediente: " + nomeIngrediente);
 
-            if(check(connection, nomeIngrediente)) {
+            if (check(connection, nomeIngrediente)) {
                 System.out.println("PRODOTTO: Ingrediente già presente: " + nomeIngrediente);
                 return false;
             }
@@ -143,7 +144,8 @@ public class Ingrediente {
                         var codiceIngrediente = resultSet.getString("Codice_Ingrediente");
                         var nomeIngrediente = resultSet.getString("Nome_Ingrediente");
                         var senzaGlutine = resultSet.getBoolean("SenzaGlutine");
-                        Ingrediente ingrediente = new Ingrediente(vegano, senzaGlutine, senzaLattosio, nomeIngrediente, codiceIngrediente);
+                        Ingrediente ingrediente = new Ingrediente(vegano, senzaGlutine, senzaLattosio, nomeIngrediente,
+                                codiceIngrediente);
                         ingredienti.add(ingrediente);
                     }
                 }
@@ -153,7 +155,8 @@ public class Ingrediente {
             return ingredienti;
         }
 
-        public static Map<String, Integer> getIngredientiWithQuantita(final Connection connection, final String codiceProdotto) {
+        public static Map<String, Integer> getIngredientiWithQuantita(final Connection connection,
+                final String codiceProdotto) {
 
             Map<String, Integer> listaIngredienti = new HashMap<>();
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INGREDIENTI_CONTENUTI_Quantita.get())) {
@@ -193,7 +196,7 @@ public class Ingrediente {
             return listaIngredienti;
         }
 
-        public static String getLast(Connection connection){
+        public static String getLast(Connection connection) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_INGREDIENTE.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -207,7 +210,8 @@ public class Ingrediente {
         }
 
         public static String getIngredienteCodebyName(Connection connection, String nomeIngrediente) {
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_INGREDIENTE_BY_NAME.get(), nomeIngrediente)) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_INGREDIENTE_BY_NAME.get(),
+                    nomeIngrediente)) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         return resultSet.getString("Codice_Ingrediente");
@@ -219,6 +223,19 @@ public class Ingrediente {
             return null;
         }
 
+    }
+
+    public static boolean verificaQuantitaIngrediente(Connection connection, String codiceIngrediente,
+            int quantitaRichiesta, String codiceProdotto) {
+        try (
+                var statement = DAOUtils.prepare(connection, Queries.MOSTRA_RICETTA_PRODOTTO.get(), codiceIngrediente,
+                        quantitaRichiesta, codiceProdotto);
+                var resultSet = statement.executeQuery();) {
+            return resultSet.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

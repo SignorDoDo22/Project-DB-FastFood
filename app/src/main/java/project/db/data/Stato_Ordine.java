@@ -49,7 +49,8 @@ public class Stato_Ordine {
         public static List<Stato_Ordine> list(Connection connection, String codiceOrdine) {
             List<Stato_Ordine> statiOrdine = new ArrayList<>();
 
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_STATO_ORDINE.get())) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.MOSTRA_STATO_ORDINE.get())) {
                 preparedStatement.setString(1, codiceOrdine);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -68,7 +69,8 @@ public class Stato_Ordine {
         }
 
         public static boolean insert(Connection connection, Stato_Ordine statoOrdine) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_STATO_ORDINE.get())) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.INSERIRE_STATO_ORDINE.get())) {
                 preparedStatement.setString(1, statoOrdine.getCodiceOrdine());
                 preparedStatement.setString(2, statoOrdine.getStato());
                 preparedStatement.setDate(3, statoOrdine.getData());
@@ -81,35 +83,20 @@ public class Stato_Ordine {
             }
         }
 
-        public static List<Ordine> allOrdiniPronti(Connection connection) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ORDINI_IN_PREPARAZIONE.get())) {
-                ResultSet resultSet = preparedStatement.executeQuery();
-                return null;
-            } catch (SQLException e) {
-                throw new DAOException("Error checking for ready orders", e);
-            }
-        }
-
-        public static boolean updateOrdineToInConsegna(Connection connection, String codiceOrdine) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_ORDINE_IN_CONSEGNA.get())) {
+        public static boolean updateOrdineStato(Connection connection, String codiceOrdine, String nuovoStato) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.INSERIRE_ORDINE_STATUS.get())) {
+                preparedStatement.setString(2, nuovoStato);
                 preparedStatement.setString(1, codiceOrdine);
+                preparedStatement.setTime(3, new Time(System.currentTimeMillis()));
+
                 int rowsAffected = preparedStatement.executeUpdate();
                 return rowsAffected > 0;
             } catch (SQLException e) {
-                throw new DAOException("Error updating order to 'In Consegna'", e);
+                throw new DAOException("Error updating order state", e);
             }
-        }
 
-        public static boolean updateOrdineToConsegnato(Connection connection, String codiceOrdine) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_ORDINE_CONSEGNATO.get())) {
-                preparedStatement.setString(1, codiceOrdine);
-                int rowsAffected = preparedStatement.executeUpdate();
-                return rowsAffected > 0;
-            } catch (SQLException e) {
-                throw new DAOException("Error updating order to 'Consegnato'", e);
-            }
         }
-
 
     }
 }

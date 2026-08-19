@@ -35,14 +35,14 @@ public class Categoria {
             List<Categoria> categorie = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_CATEGORIE.get());
-                ResultSet resultSet = preparedStatement.executeQuery()) {
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                    while (resultSet.next()) {
-                        String nomeCategoria = resultSet.getString("Nome");
-                        String idCategoria = resultSet.getString("IDCategoria");
-                        Categoria categoria = new Categoria(nomeCategoria, idCategoria);
-                        categorie.add(categoria);
-                    }
+                while (resultSet.next()) {
+                    String nomeCategoria = resultSet.getString("Nome");
+                    String idCategoria = resultSet.getString("IDCategoria");
+                    Categoria categoria = new Categoria(nomeCategoria, idCategoria);
+                    categorie.add(categoria);
+                }
             } catch (SQLException e) {
                 throw new DAOException("Error listing categories", e);
             }
@@ -54,12 +54,12 @@ public class Categoria {
             List<String> categorieNames = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_CATEGORIE.get());
-                ResultSet resultSet = preparedStatement.executeQuery()) {
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                    while (resultSet.next()) {
-                        String nomeCategoria = resultSet.getString("nome_categoria");
-                        categorieNames.add(nomeCategoria);
-                    }
+                while (resultSet.next()) {
+                    String nomeCategoria = resultSet.getString("nome_categoria");
+                    categorieNames.add(nomeCategoria);
+                }
             } catch (SQLException e) {
                 throw new DAOException("Error listing category names", e);
             }
@@ -68,12 +68,13 @@ public class Categoria {
         }
 
         public static String getCategoryNamebyCod(final Connection connection, final String nomeCategoria) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.GET_CATEGORIA_BY_NAME.get(), nomeCategoria);
-                ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.GET_CATEGORIA_BY_NAME.get(),
+                    nomeCategoria);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                    if (resultSet.next()) {
-                        return resultSet.getString("IDCategoria");
-                    }
+                if (resultSet.next()) {
+                    return resultSet.getString("IDCategoria");
+                }
             } catch (SQLException e) {
                 throw new DAOException("Error getting category ID by name", e);
             }
@@ -81,10 +82,11 @@ public class Categoria {
             return null;
         }
 
-        public boolean insert(final Connection connection, final String nomeCategoria) {
+        public static boolean insert(final Connection connection, final String nomeCategoria) {
 
             String idCategoria = getProssimoCodice(connection, "CAT", 2);
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_CATEGORIA.get(), nomeCategoria, idCategoria)) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_CATEGORIA.get(),
+                    idCategoria, nomeCategoria)) {
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 throw new DAOException("Error inserting category", e);
@@ -92,7 +94,7 @@ public class Categoria {
             return true;
         }
 
-         public static String getLast(Connection connection){
+        public static String getLast(Connection connection) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_CATEGORIA.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -117,13 +119,15 @@ public class Categoria {
                 numero = Integer.parseInt(parteNumerica) + 1;
             }
 
-            System.out.println("Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
+            System.out.println(
+                    "Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
         }
 
         public static boolean checkNameCategoriaExists(Connection connection, String nomeCategoria) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.GET_CATEGORIA_BY_NAME.get(), nomeCategoria);
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.GET_CATEGORIA_BY_NAME.get(),
+                    nomeCategoria);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 return resultSet.next();
 
@@ -133,7 +137,5 @@ public class Categoria {
         }
 
     }
-
-
 
 }

@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import project.db.controller.ControllerRider;
-import project.db.data.Ordine;
 import project.db.view.MainView;
+import project.db.view.Ordine.OrdinePanel;
 
 public class RiderPanel extends JPanel {
 
@@ -21,7 +21,7 @@ public class RiderPanel extends JPanel {
     private ControllerRider controllerRider;
     private MainView mainView;
 
-    public RiderPanel( MainView mainView) {
+    public RiderPanel(MainView mainView) {
         this.mainView = mainView;
 
         this.setVisible(true);
@@ -42,9 +42,9 @@ public class RiderPanel extends JPanel {
         this.buttonIndietro.addActionListener(e -> mainView.changePanel("scelta"));
     }
 
-    public void showOrdersReady(List<OrdineRiderPanel> ordini) {
+    public void showOrdersReady(List<OrdinePanel> ordini) {
         panelInterno.removeAll();
-        for (OrdineRiderPanel ordinePanel : ordini) {
+        for (OrdinePanel ordinePanel : ordini) {
             panelInterno.add(ordinePanel);
         }
 
@@ -54,5 +54,14 @@ public class RiderPanel extends JPanel {
 
     public void setControllerRider(ControllerRider controllerRider) {
         this.controllerRider = controllerRider;
+    }
+
+    public void showErrorMessage(String message) {
+        javax.swing.JOptionPane.showMessageDialog(this, message, "Errore", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showInfoMessage(String message) {
+        javax.swing.JOptionPane.showMessageDialog(this, message, "Informazione",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
     }
 }

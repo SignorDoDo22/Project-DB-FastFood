@@ -78,6 +78,8 @@ public class Prodotto {
             return catalogo;
         }
 
+
+
         public static boolean check(final Connection connection, final String Codice_Prodotto) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_PRODOTTO_PER_CODICE.get())) {
                 preparedStatement.setString(1, Codice_Prodotto);
@@ -152,6 +154,8 @@ public class Prodotto {
                 throw new DAOException("Errore nel controllo storico ordini del prodotto", e);
             }
         }
+
+
 
         public static boolean aggiornaProdotto(final Connection connection, final String codiceProdotto, final String nome,
                                               final String descrizione, final float prezzo, final boolean disponibile) {

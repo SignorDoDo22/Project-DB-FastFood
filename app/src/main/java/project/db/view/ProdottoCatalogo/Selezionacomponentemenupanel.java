@@ -1,7 +1,7 @@
 package project.db.view.ProdottoCatalogo;
 
-import project.db.view.Client.RigaCarrello;
-
+import project.db.data.Pair;
+import project.db.view.Client.RigaCarrelloMenu;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -26,10 +26,10 @@ public class Selezionacomponentemenupanel extends JDialog {
     private final JComboBox<String> componentiComboBox = new JComboBox<>();
     private final JButton selezionaButton = new JButton("Modifica ingredienti di questo prodotto");
     private final JButton chiudiButton = new JButton("Chiudi");
-    private final RigaCarrello rigaCarrello;
-    private Map<String, List<String>> componenti;
+    private final RigaCarrelloMenu rigaCarrello;
+    private Map<Pair<String, Integer>, List<String>> componenti;
 
-    public Selezionacomponentemenupanel(RigaCarrello rigaCarrello) {
+    public Selezionacomponentemenupanel(RigaCarrelloMenu rigaCarrello) {
         this.rigaCarrello = rigaCarrello;
 
         this.setTitle("Seleziona prodotto del menu da modificare");
@@ -58,23 +58,32 @@ public class Selezionacomponentemenupanel extends JDialog {
             String componenteSelezionato = (String) componentiComboBox.getSelectedItem();
 
             if (componenteSelezionato == null || componenti == null) {
-                JOptionPane.showMessageDialog(this, "Nessun prodotto selezionato.", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Nessun prodotto selezionato.", "Errore",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            rigaCarrello.setProdottoMenuSelezionato(
+                    new Pair<String, Integer>(componenteSelezionato, componentiComboBox.getSelectedIndex()));
+            rigaCarrello.requestIngredienti();
 
-            rigaCarrello.selezionaComponenteMenu(componenteSelezionato, componenti.get(componenteSelezionato));
         });
 
         chiudiButton.addActionListener(e -> this.setVisible(false));
     }
 
-    public void caricaComponenti(Map<String, List<String>> componenti) {
+    public void caricaComponenti(Map<Pair<String, Integer>, List<String>> componenti) {
         this.componenti = componenti;
         componentiComboBox.removeAllItems();
         if (componenti != null) {
-            for (String nomeComponente : componenti.keySet()) {
-                componentiComboBox.addItem(nomeComponente);
+            for (Pair<String, Integer> nomeComponente : componenti.keySet()) {
+                componentiComboBox.addItem(nomeComponente.getFirst());
+                System.out.println("Caricato componente menu: " + nomeComponente.getFirst() + ", numRowComp: "
+                        + nomeComponente.getSecond());
             }
         }
+    }
+
+    public Map<Pair<String, Integer>, List<String>> getComponenti() {
+        return componenti;
     }
 }

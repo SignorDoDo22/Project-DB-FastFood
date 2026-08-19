@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import project.db.Queries;
 import project.db.controller.DAOUtils;
@@ -18,7 +19,8 @@ public class ModificaProdotto {
     private String tipoModifica;
     private int quantita;
 
-    public ModificaProdotto(int quantita, String codiceProdotto, String codiceRiga, String nomeIngrediente, String codiceIngrediente, String tipoModifica, String codiceOrdine) {
+    public ModificaProdotto(int quantita, String codiceProdotto, String codiceRiga, String nomeIngrediente,
+            String codiceIngrediente, String tipoModifica, String codiceOrdine) {
         this.codiceProdotto = codiceProdotto;
         this.codiceRiga = codiceRiga;
         this.nomeIngrediente = nomeIngrediente;
@@ -29,8 +31,8 @@ public class ModificaProdotto {
     }
 
     public String getCodiceProdotto() {
-            return codiceProdotto;
-        }
+        return codiceProdotto;
+    }
 
     public String getNomeIngrediente() {
         return nomeIngrediente;
@@ -44,7 +46,6 @@ public class ModificaProdotto {
         return tipoModifica;
     }
 
-
     public String getCodiceRiga() {
         return codiceRiga;
     }
@@ -57,22 +58,23 @@ public class ModificaProdotto {
         return quantita;
     }
 
-
     public static class DAO {
 
-        public List<ModificaProdotto> getModificaProdottoByCodiceRiga(Connection connection, String codiceRiga, String codiceOrdine) {
+        public static List<ModificaProdotto> getModificaProdottoByCodiceRiga(Connection connection, String codiceRiga,
+                String codiceOrdine) {
             List<ModificaProdotto> modificheProdotto = new ArrayList<>();
             try (
-                var statement = DAOUtils.prepare(connection, Queries.MOSTRA_MODIFICHE_RIGA_SINGOLA.get(), codiceRiga, codiceOrdine);
-                var setResult = statement.executeQuery();
-            ) {
+                    var statement = DAOUtils.prepare(connection, Queries.MOSTRA_MODIFICHE_RIGA_SINGOLA.get(),
+                            codiceRiga, codiceOrdine);
+                    var setResult = statement.executeQuery();) {
                 while (setResult.next()) {
                     String codiceProdotto = setResult.getString("Codice_Prodotto");
                     String nomeIngrediente = setResult.getString("Nome_Ingrediente");
                     String codiceIngrediente = setResult.getString("Codice_Ingrediente");
                     String tipoModifica = setResult.getString("Tipo_Modifica");
                     int quantita = setResult.getInt("Quantita");
-                    ModificaProdotto modificaProdotto = new ModificaProdotto(quantita, codiceProdotto, codiceRiga, nomeIngrediente, codiceIngrediente, tipoModifica, codiceOrdine);
+                    ModificaProdotto modificaProdotto = new ModificaProdotto(quantita, codiceProdotto, codiceRiga,
+                            nomeIngrediente, codiceIngrediente, tipoModifica, codiceOrdine);
                     modificheProdotto.add(modificaProdotto);
                 }
             } catch (Exception e) {
@@ -81,43 +83,31 @@ public class ModificaProdotto {
             return modificheProdotto;
         }
 
-        public boolean inserisciModificaProdotto(Connection connection, int quantita, String codiceProdotto, String nomeIngrediente,
-             String codiceIngrediente, String tipoModifica, String codiceRiga, String codiceOrdine) {
+        public static boolean verificaQuantitaIngrediente(Connection connection, String codiceIngrediente,
+                int quantitaRichiesta, String codiceProdotto) {
+            try (
+                    var statement = DAOUtils.prepare(connection, Queries.MOSTRA_QUANTITA_INGREDIENTE_PRODOTTO.get(),
+                            codiceProdotto, codiceIngrediente);
+                    var resultSet = statement.executeQuery();) {
 
-            if(tipoModifica.equals("Elimina")){
-                if(!verificaQuantitaIngrediente(connection, codiceIngrediente, quantita)){
+                if (!resultSet.next()) {
+                    // nessuna riga trovata: l'ingrediente non è associato a quel prodotto
                     return false;
                 }
-            }
 
-            try (
-                var statement = DAOUtils.prepare(connection, Queries.INSERIRE_MODIFICA_PRODOTTO_SINGOLO.get(),
-                        codiceRiga,
-                        codiceProdotto,
-                        codiceIngrediente,
-                        tipoModifica,
-                        quantita,
-                        codiceOrdine);
-            ) {
-               statement.executeUpdate();
+                int quantitaPresente = resultSet.getInt("Quantita");
+
+                if (resultSet.wasNull()) {
+                    return false;
+                }
+
+                return quantitaPresente >= quantitaRichiesta;
 
             } catch (SQLException e) {
                 e.printStackTrace();
                 return false;
             }
-            return true;
         }
 
-        public boolean verificaQuantitaIngrediente(Connection connection, String codiceIngrediente, int quantitaRichiesta) {
-            try (
-                var statement = DAOUtils.prepare(connection, Queries.MOSTRA_RICETTA_PRODOTTO.get(), codiceIngrediente, quantitaRichiesta);
-                var resultSet = statement.executeQuery();
-            ) {
-                return resultSet.next();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
     }
 }

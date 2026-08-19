@@ -1,25 +1,23 @@
 package project.db.controller;
 
 import project.db.view.Client.RigaCarrello;
+import project.db.view.Client.RigaCarrelloMenu;
+import project.db.view.Client.RigaCarrelloSingolo;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import project.db.data.Cliente;
-import project.db.data.CompRigaOrdineMenu;
 import project.db.data.Ingrediente;
-import project.db.data.RigaOrdine;
+import project.db.data.Pair;
 import project.db.model.ReadingModel;
 import project.db.model.WritingModel;
 import project.db.view.Client.ClientPanel;
 import project.db.view.Client.DomicilioPanel;
 import project.db.view.Client.Carrello;
 import project.db.view.Client.RecensioniPanel;
-
-
 
 public class ControllerClientPanel {
 
@@ -31,9 +29,10 @@ public class ControllerClientPanel {
     private Cliente utenteLoggato;
     private final RecensioniPanel recensioniPanel;
     private DomicilioPanel domicilioPanel;
+    private List<RigaCarrello> prodottiCarrello = new ArrayList<>();
 
-
-    public ControllerClientPanel(final ReadingModel modelReading, final WritingModel modelWriting, final ClientPanel clientPanel, final MainController mainController){
+    public ControllerClientPanel(final ReadingModel modelReading, final WritingModel modelWriting,
+            final ClientPanel clientPanel, final MainController mainController) {
 
         this.modelReading = modelReading;
         this.modelWriting = modelWriting;
@@ -68,21 +67,16 @@ public class ControllerClientPanel {
         this.clientPanel.mostraIngredienti(ingredienti);
     }
 
-
-    public void userRequestOrdiniRecensibili(){
-        final var ordiniRecensibili = this.modelReading.loadOrdiniRecensibili(this.mainController.getControllerLogin().getUtente().getCodiceUtente());
+    public void userRequestOrdiniRecensibili() {
+        final var ordiniRecensibili = this.modelReading
+                .loadOrdiniRecensibili(this.mainController.getControllerLogin().getUtente().getCodiceUtente());
         System.out.println("Ordini recensibili caricati con successo: " + ordiniRecensibili.size());
         this.recensioniPanel.mostraRecensioni(ordiniRecensibili);
     }
 
-    public void userRequestIngredientiMenu(final String codiceProdottoMenu){
+    public void userRequestIngredientiMenu(final String codiceProdottoMenu) {
         this.clientPanel.mostraIngredientiMenu(this.modelReading.loadIngredientiMenu(codiceProdottoMenu));
 
-    }
-
-    public void userRequestIngredientiFromRigaCarrello(final String codiceProdotto, final RigaCarrello rigaCarrello){
-        final var ingredienti = this.modelReading.loadIngredientiFromRigaCarrello(codiceProdotto);
-        rigaCarrello.mostraIngredienti(ingredienti);
     }
 
     /**
@@ -90,43 +84,51 @@ public class ControllerClientPanel {
      * per una specifica riga del carrello, così l'utente può scegliere quale
      * prodotto contenuto nel menu vuole modificare.
      */
-    public void userRequestComponentiMenu(final String codiceProdottoMenu, final RigaCarrello rigaCarrello) {
-        final Map<String, List<String>> componenti = this.modelReading.loadIngredientiMenu(codiceProdottoMenu);
-        System.out.println("Componenti del menu caricate con successo: " + componenti.size());
+    public void userRequestComponentiMenu(final String codiceProdottoMenu, final RigaCarrelloMenu rigaCarrello) {
+        final Map<Pair<String, Integer>, List<String>> componenti = this.modelReading
+                .loadIngredientiMenu(codiceProdottoMenu);
         rigaCarrello.mostraComponentiMenu(componenti);
     }
 
-    /**
-     * Restituisce i nomi di tutti gli ingredienti disponibili a catalogo,
-     * usati per popolare la sezione "aggiungi ingrediente" nel pannello di
-     * modifica del carrello.
-     *
-     * NOTA: assume che Ingrediente esponga un metodo getNomeIngrediente().
-     * Se il getter si chiama diversamente, va corretto qui.
-     */
-    public List<String> userRequestIngredientiDisponibili() {
+    public void userRequestComponentiMenuCaricamento(final String codiceProdottoMenu,
+            final RigaCarrelloMenu rigaCarrello) {
+
+        final Map<Pair<String, Integer>, List<String>> componenti = this.modelReading
+                .loadIngredientiMenu(codiceProdottoMenu);
+        rigaCarrello.caricaProdottiMenu(componenti);
+    }
+
+    public void userRequestIngredientiDisponibili(RigaCarrello riga) {
         final var ingredientiDisponibili = this.modelReading.loadIngredientiDisponibili();
         final List<String> nomiIngredienti = new ArrayList<>();
         for (final Ingrediente ingrediente : ingredientiDisponibili) {
             nomiIngredienti.add(ingrediente.getNomeIngrediente());
         }
-        return nomiIngredienti;
+        if (riga instanceof RigaCarrelloMenu) {
+            RigaCarrelloMenu rigaMenu = (RigaCarrelloMenu) riga;
+            System.out.println("SONO DENTRO INSTANCEOF " + rigaMenu.getNomeProdotto() + " -> "
+                    + nomiIngredienti);
+            rigaMenu.mostraIngredientiDisponibili(nomiIngredienti);
+        } else {
+            riga.mostraIngredientiDisponibili(nomiIngredienti);
+        }
     }
 
-        public void userRequestCreateRecensione(String codiceOrdine, int votoRider, int votoOrdine, String testoRecensione) {
-            this.modelWriting.inserisciRecensione(codiceOrdine, testoRecensione, votoOrdine, votoRider);
+    public void userRequestModificaRigaCarrello(RigaCarrello riga) {
+        if (riga.isMenu()) {
+            RigaCarrelloMenu rigaMenu = (RigaCarrelloMenu) riga;
+            userRequestComponentiMenu(rigaMenu.getCodiceProdotto(), rigaMenu);
+        } else {
+            userRequestIngredientiDisponibili(riga);
         }
+        System.out.println("Riga selezionata per la modifica: " + riga.getCodiceProdotto());
+    }
 
-        /**
-         * Crea un nuovo ordine a partire dal contenuto del carrello: inserisce prima
-         * l'ordine (con i dati del domicilio) e poi, una per una, tutte le righe
-         * prodotto associate. Se l'inserimento dell'ordine o di una qualsiasi riga
-         * fallisce, l'operazione viene interrotta e il metodo ritorna false, senza
-         * svuotare il carrello (così l'utente non perde ciò che aveva selezionato
-         * e può riprovare).
-         *
-         * @return true se l'ordine e tutte le sue righe sono stati creati con successo.
-         */
+    public void userRequestCreateRecensione(String codiceOrdine, int votoRider, int votoOrdine,
+            String testoRecensione) {
+        this.modelWriting.inserisciRecensione(codiceOrdine, testoRecensione, votoOrdine, votoRider);
+    }
+
     public boolean userCreateOrdine() {
         final Map<String, String> datiDomicilio = domicilioPanel.getCampiDomicilio();
         final String codiceUtente = this.utenteLoggato.getCodiceUtente();
@@ -144,9 +146,16 @@ public class ControllerClientPanel {
                 return false;
             }
 
-            for (final RigaCarrello riga : carrello.getRigheCarrello()) {
+            if (this.modelWriting.aggiornaStatoOrdine(conn, codiceOrdine, "In Preparazione")) {
+                System.out.println("Stato ordine inserito con successo per codice: " + codiceOrdine);
+            } else {
+                System.out.println("Inserimento stato ordine fallito per codice: " + codiceOrdine);
+                conn.rollback();
+                return false;
+            }
 
-                final String codiceRiga = RigaOrdine.DAO.getNextCodiceRiga(conn, codiceOrdine);
+            System.out.println(carrello.getRigheCarrello().size() + " prodotti singoli nel carrello");
+            for (final RigaCarrello riga : carrello.getRigheCarrello()) {
 
                 final boolean rigaInserita = this.modelWriting.createRigaOrdine(
                         codiceOrdine,
@@ -154,12 +163,62 @@ public class ControllerClientPanel {
                         riga.getQuantita(),
                         riga.getPrezzo(),
                         riga.isMenu(),
-                        codiceRiga);
+                        riga.getCodiceRiga());
 
                 if (!rigaInserita) {
                     System.out.println("Inserimento riga fallito per il prodotto: " + riga.getCodiceProdotto());
                     conn.rollback();
                     return false;
+                }
+
+                if (riga.isMenu()) {
+
+                    modelWriting.inserireMenuRiga(conn, codiceOrdine, riga.getCodiceRiga(), riga.getCodiceProdotto());
+                    RigaCarrelloMenu rigaMenu = (RigaCarrelloMenu) riga;
+                    Map<Integer, String> componentiMenu = rigaMenu.getComponentiMenu();
+                    System.out
+                            .println("Componenti menu per la riga: " + riga.getCodiceRiga() + " -> " + componentiMenu);
+                    for (Map.Entry<Integer, String> entry : componentiMenu.entrySet()) {
+                        String codiceProdotto = modelReading.getCodiceProdottoByNome(entry.getValue());
+                        System.out.println("Inserimento componente menu per riga: " + riga.getCodiceRiga()
+                                + ", prodotto: " + codiceProdotto + ", numRowComp: " + entry.getKey());
+                        this.modelWriting.inserisciCompMenuRiga(conn, codiceOrdine, riga.getCodiceRiga(),
+                                codiceProdotto,
+                                entry.getKey());
+                    }
+
+                    Map<Pair<String, Integer>, Map<String, Pair<String, Integer>>> ingredientiModificati = rigaMenu
+                            .getIngredientiModificati();
+                    for (Pair<String, Integer> prodotto : ingredientiModificati.keySet()) {
+                        String nomeProdotto = prodotto.getFirst();
+                        Integer numRowComp = prodotto.getSecond();
+                        System.out.println("NUMROW: " + numRowComp + " PRODOTTO: " + nomeProdotto);
+                        Map<String, Pair<String, Integer>> modifiche = ingredientiModificati.get(prodotto);
+                        for (String modifica : modifiche.keySet()) {
+
+                            Integer quantita = modifiche.get(modifica).getSecond();
+                            String tipo = modifiche.get(modifica).getFirst();
+
+                            this.modelWriting.inserisciModificaCompMenu(conn, codiceOrdine, rigaMenu.getCodiceRiga(),
+                                    numRowComp,
+                                    modelReading.getCodiceIngredienteByNome(modifica), quantita, tipo);
+
+                        }
+
+                    }
+
+                } else {
+                    RigaCarrelloSingolo rigaSingolo = (RigaCarrelloSingolo) riga;
+                    modelWriting.inserireRigaSingolo(conn, codiceOrdine, rigaSingolo.getCodiceRiga(),
+                            rigaSingolo.getCodiceProdotto());
+
+                    for (Map.Entry<String, Pair<String, Integer>> entry : rigaSingolo
+                            .getIngredientiModificatiProdSingolo().entrySet()) {
+                        String nomeIngrediente = entry.getKey();
+                        String tipo = entry.getValue().getFirst();
+                        Integer quantita = entry.getValue().getSecond();
+                    }
+
                 }
 
             }
@@ -186,13 +245,29 @@ public class ControllerClientPanel {
         }
     }
 
+    public String generaProssimoCodiceRiga() {
+        int numero = carrello.getRigheCarrello().size() + 1;
+        System.out.println("Prossimo codice riga generato: R" + String.format("%03d", numero));
+        return String.format("R%03d", numero);
+    }
+
+    public boolean verificaEliminazioneIngrediente(String nomeProdotto, String nomeIngrediente,
+            int quantitaRichiesta) {
+        return modelReading.controllaQuantitaIngrediente(modelReading.getCodiceIngredienteByNome(nomeIngrediente),
+                quantitaRichiesta, nomeProdotto);
+    }
+
     public void setVisibleDomicilioPanel(boolean visible) {
         if (domicilioPanel != null) {
             domicilioPanel.setVisible(visible);
         }
     }
 
-    public void logout(){
+    public void addRigaCarrello(RigaCarrello riga) {
+        prodottiCarrello.add(riga);
+    }
+
+    public void logout() {
         this.utenteLoggato = null;
     }
 

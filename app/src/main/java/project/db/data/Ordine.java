@@ -21,10 +21,9 @@ public class Ordine {
     private String ind_Civico;
     private String codice_Utente;
     private String codice_Ordine;
-    private String rig_ordine = "RIG01";
 
     public Ordine(final Date dataCreazione, final String ind_via, final String ind_Città, final String ind_Civico,
-        final String codice_Utente, final String codice_Ordine){
+            final String codice_Utente, final String codice_Ordine) {
 
         this.dataCreazione = dataCreazione;
         this.ind_Città = ind_Città;
@@ -60,12 +59,12 @@ public class Ordine {
 
     public static class DAO {
 
-        public static List<Ordine> list(Connection connection){
+        public static List<Ordine> list(Connection connection) {
 
             List<Ordine> listOrdine = new ArrayList<>();
 
-            try( var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ORDINI.get());
-                ResultSet result = preparedStatement.executeQuery()) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ORDINI.get());
+                    ResultSet result = preparedStatement.executeQuery()) {
 
                 while (result.next()) {
 
@@ -80,12 +79,13 @@ public class Ordine {
                 }
 
             } catch (Exception e) {
-                throw new DAOException("Errore nel caricamento degli ordini",e);
+                throw new DAOException("Errore nel caricamento degli ordini", e);
             }
             return listOrdine;
         }
 
-        public static boolean inserisciOrdine(Connection connection, Map<String, String> datiDomicilio, String codiceUtente, String codiceOrdine) {
+        public static boolean inserisciOrdine(Connection connection, Map<String, String> datiDomicilio,
+                String codiceUtente, String codiceOrdine) {
 
             Date oggi = Date.valueOf(LocalDate.now());
 
@@ -104,13 +104,11 @@ public class Ordine {
             return true;
         }
 
-
-
-        public static List<Ordine> OrdearReady(Connection connection){
+        public static List<Ordine> OrdearReady(Connection connection) {
             List<Ordine> ordiniPronti = new ArrayList<>();
 
-            try(var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ORDINI_PRONTI.get());
-                ResultSet result = preparedStatement.executeQuery()) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ORDINI_PRONTI.get());
+                    ResultSet result = preparedStatement.executeQuery()) {
 
                 while (result.next()) {
 
@@ -144,18 +142,21 @@ public class Ordine {
                         var indCittà = result.getString("Ind_Citta");
                         var indCivico = result.getString("Ind_Civico");
                         var codiceordine = result.getString("Codice_Ordine");
-                        Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente, codiceordine);
+                        Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente,
+                                codiceordine);
                         ordiniRecensibili.add(ordine);
                     }
                 }
             } catch (Exception e) {
                 throw new DAOException("Errore nel caricamento degli ordini recensibili", e);
             }
-            System.out.println("Numero di ordini recensibili per l'utente " + codiceUtente + ": " + ordiniRecensibili.size());
+            System.out.println(
+                    "Numero di ordini recensibili per l'utente " + codiceUtente + ": " + ordiniRecensibili.size());
             return ordiniRecensibili;
         }
 
-        public static boolean inserisciRecensione(Connection connection, String numOrdine, String testoRecensione, int votoOrdine, int votoRider) {
+        public static boolean inserisciRecensione(Connection connection, String numOrdine, String testoRecensione,
+                int votoOrdine, int votoRider) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_RECENSIONE.get())) {
                 preparedStatement.setString(1, numOrdine);
                 preparedStatement.setInt(2, votoRider);
@@ -185,7 +186,7 @@ public class Ordine {
                 }
 
                 // seconda operazione, stessa connessione, stessa transazione
-                boolean statoAggiornato = Stato_Ordine.DAO.updateOrdineToInConsegna(connection, codiceOrdine);
+                boolean statoAggiornato = Stato_Ordine.DAO.updateOrdineStato(connection, codiceOrdine, "In Consegna");
 
                 if (!statoAggiornato) {
                     connection.rollback();
@@ -210,9 +211,7 @@ public class Ordine {
             }
         }
 
-
-
-        public static String getLast(Connection connection){
+        public static String getLast(Connection connection) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ULTIMO_ORDINE_CODICE.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -237,8 +236,33 @@ public class Ordine {
                 numero = Integer.parseInt(parteNumerica) + 1;
             }
 
-            System.out.println("Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
+            System.out.println(
+                    "Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
+        }
+
+        public static List<Ordine> listOrdiniByAdmin(Connection connection) {
+            List<Ordine> ordini = new ArrayList<>();
+
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ORDINI_IN_PREPARAZIONE.get());
+                    ResultSet result = preparedStatement.executeQuery()) {
+
+                while (result.next()) {
+                    var dataCreazione = result.getDate("DataCreazione");
+                    var indVia = result.getString("Ind_Via");
+                    var indCittà = result.getString("Ind_Citta");
+                    var indCivico = result.getString("Ind_Civico");
+                    var codiceUtente = result.getString("Codice_Utente");
+                    var codiceordine = result.getString("Codice_Ordine");
+                    Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente, codiceordine);
+                    ordini.add(ordine);
+                }
+
+            } catch (Exception e) {
+                throw new DAOException("Errore nel caricamento degli ordini per l'admin", e);
+            }
+            return ordini;
+
         }
 
     }

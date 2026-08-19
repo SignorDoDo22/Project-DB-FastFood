@@ -1,10 +1,14 @@
 package project.db.model;
+
 import java.sql.Connection;
 
+import project.db.data.Categoria;
 import project.db.data.Cliente;
 import project.db.data.CompRigaOrdineMenu;
 import project.db.data.Ingrediente;
+import project.db.data.ModificaProdotto;
 import project.db.data.Ordine;
+import project.db.data.Pair;
 import project.db.data.Prodotto;
 import project.db.data.ProdottoMenu;
 import project.db.data.Rider;
@@ -31,10 +35,9 @@ public class WritingModel {
     }
 
     public boolean aggiornaProdotto(final String codiceProdotto, final String nome, final String descrizione,
-                                     final float prezzo, final boolean disponibile) {
+            final float prezzo, final boolean disponibile) {
         return Prodotto.DAO.aggiornaProdotto(connection, codiceProdotto, nome, descrizione, prezzo, disponibile);
     }
-
 
     public void rendiNonDisponibile(final String codiceProdotto) {
         Prodotto.DAO.rendiNonDisponibile(connection, codiceProdotto);
@@ -48,23 +51,27 @@ public class WritingModel {
         ProdottoSingolo.DAO.eliminaProdottoSingolo(connection, codiceProdotto);
     }
 
-    public boolean inserisciProdottoSingolo(final String codiceProdotto, final String singolo, final Map<String, String> dataProdotto) {
+    public boolean inserisciProdottoSingolo(final String codiceProdotto, final String singolo,
+            final Map<String, String> dataProdotto) {
         return Prodotto.DAO.insert(connection, dataProdotto, singolo, codiceProdotto);
     }
 
-    public boolean inserisciIngredienteNelProdotto(final String codiceProdotto, final String codiceIngrediente, final int quantita) {
+    public boolean inserisciIngredienteNelProdotto(final String codiceProdotto, final String codiceIngrediente,
+            final int quantita) {
         return ProdottoSingolo.DAO.addIngredienteToProdotto(connection, codiceProdotto, codiceIngrediente, quantita);
     }
 
-    public void inserisciRecensione(final String numOrdine, final String testoRecensione, final int votoOrdine, final int votoRider) {
+    public void inserisciRecensione(final String numOrdine, final String testoRecensione, final int votoOrdine,
+            final int votoRider) {
         Ordine.DAO.inserisciRecensione(connection, numOrdine, testoRecensione, votoOrdine, votoRider);
     }
 
-    public boolean createIngrediente(final String nomeIngrediente, final Map<String,Boolean> ingredientiPresentiCheckBox) {
+    public boolean createIngrediente(final String nomeIngrediente,
+            final Map<String, Boolean> ingredientiPresentiCheckBox) {
         return Ingrediente.DAO.insert(connection, nomeIngrediente, ingredientiPresentiCheckBox);
     }
 
-    public boolean inserisciRider(final Map<String,String> data) {
+    public boolean inserisciRider(final Map<String, String> data) {
         return Rider.DAO.insert(data, connection);
     }
 
@@ -72,7 +79,7 @@ public class WritingModel {
         return Ordine.DAO.prendeInCaricoOrdine(connection, codiceOrdine, codiceRider);
     }
 
-    public boolean inserisciMenu(final Map<String,String> dataProdotto, String menu, String codice) {
+    public boolean inserisciMenu(final Map<String, String> dataProdotto, String menu, String codice) {
         return Prodotto.DAO.insert(connection, dataProdotto, menu, codice);
     }
 
@@ -88,31 +95,64 @@ public class WritingModel {
         return ProdottoMenu.DAO.eliminaMenu(connection, codiceMenu);
     }
 
-    public boolean createOrdine(Map<String,String> domicilio, final String codiceUtente, final String codiceOrdine) {
+    public boolean createOrdine(Map<String, String> domicilio, final String codiceUtente, final String codiceOrdine) {
         return Ordine.DAO.inserisciOrdine(connection, domicilio, codiceUtente, codiceOrdine);
     }
 
-    public boolean createRigaOrdine(final String codiceOrdine, String codiceProdotto, int quantita, float prezzo, boolean menu, String codiceRiga) {
-        return RigaOrdine.DAO.inserisciRigaOrdine(connection, codiceOrdine, codiceProdotto, quantita, prezzo, menu, codiceRiga);
+    public boolean createRigaOrdine(final String codiceOrdine, String codiceProdotto, int quantita, float prezzo,
+            boolean menu, String codiceRiga) {
+        return RigaOrdine.DAO.inserisciRigaOrdine(connection, codiceOrdine, codiceProdotto, quantita, prezzo, menu,
+                codiceRiga);
     }
 
-    public boolean createCompMenuOrdine(String CodiceOrdine, String CodiceRiga, String codiceProdotto, int NumRowCompMenu){
-        return CompRigaOrdineMenu.DAO.insertRigaOrdineMenu(connection, NumRowCompMenu, CodiceOrdine, CodiceRiga, codiceProdotto);
+    public boolean createCompMenuOrdine(String CodiceOrdine, String CodiceRiga, String codiceProdotto,
+            int NumRowCompMenu) {
+        return CompRigaOrdineMenu.DAO.insertRigaOrdineMenu(connection, NumRowCompMenu, CodiceOrdine, CodiceRiga,
+                codiceProdotto);
     }
 
-    public boolean createModificaCompMenu(String Codice_Ordine, String Codice_Riga, int NumRowCompMenu, String CodiceIngrediente, int quantita, String tipo){
-        return CompRigaOrdineMenu.DAO.insertModificaCompMenu(connection, Codice_Ordine, Codice_Riga, NumRowCompMenu, CodiceIngrediente, quantita, tipo);
+    public boolean createModificaCompMenu(String Codice_Ordine, String Codice_Riga, int NumRowCompMenu,
+            String CodiceIngrediente, int quantita, String tipo) {
+        return CompRigaOrdineMenu.DAO.insertModificaCompMenu(connection, Codice_Ordine, Codice_Riga, NumRowCompMenu,
+                CodiceIngrediente, quantita, tipo);
     }
 
     public boolean createCategoria(final String nomeCategoria) {
-        return false; //return Categoria.DAO.insert(connection, nomeCategoria);
+        return Categoria.DAO.insert(connection, nomeCategoria);
     }
 
     public boolean riderPrendeInCaricoOrdine(final String codiceOrdine, final String codiceRider) {
         return Ordine.DAO.prendeInCaricoOrdine(connection, codiceOrdine, codiceRider);
     }
 
-    public boolean riderCompletaConsegna(final String codiceOrdine) {
-        return Stato_Ordine.DAO.updateOrdineToConsegnato(connection, codiceOrdine);
+    public boolean inserireMenuRiga(final Connection connection, final String codiceOrdine, final String codiceRiga,
+            final String codiceProdotto) {
+        return RigaOrdine.DAO.inserireRigaMenu(codiceOrdine, codiceRiga, codiceProdotto, connection);
     }
+
+    public boolean inserisciCompMenuRiga(Connection connection, String codiceOrdine, String codiceRiga,
+            String codiceProdotto, Integer numRowComp) {
+        return RigaOrdine.DAO.InserisciCompMenuRiga(connection, codiceOrdine, codiceRiga, codiceProdotto, numRowComp);
+    }
+
+    public boolean inserisciModificaRigSingolo(Connection connection, String codiceOrdine, String codiceRiga) {
+        return false; // String codiceIngrediente, int quantita, String tipo) {
+
+    }
+
+    public boolean inserisciModificaCompMenu(Connection connection, String codiceOrdine, String codiceRiga,
+            int numRowCompMenu, String codiceIngrediente, int quantita, String tipo) {
+        return CompRigaOrdineMenu.DAO.insertModificaCompMenu(connection, codiceOrdine, codiceRiga, numRowCompMenu,
+                codiceIngrediente, quantita, tipo);
+    }
+
+    public boolean inserireRigaSingolo(Connection connection, String codiceOrdine, String codiceRiga,
+            String codiceProdotto) {
+        return RigaOrdine.DAO.inserireRigaSingolo(codiceOrdine, codiceRiga, codiceProdotto, connection);
+    }
+
+    public boolean aggiornaStatoOrdine(Connection connection, String codiceOrdine, String nuovoStato) {
+        return Stato_Ordine.DAO.updateOrdineStato(connection, codiceOrdine, nuovoStato);
+    }
+
 }

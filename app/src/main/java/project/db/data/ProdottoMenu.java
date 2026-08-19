@@ -2,7 +2,9 @@ package project.db.data;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.sql.Connection;
 import java.sql.SQLException;
 import project.db.Queries;
@@ -14,8 +16,8 @@ public class ProdottoMenu extends Prodotto {
     private String codiceMenu;
 
     public ProdottoMenu(final boolean disponibile, final String codice_prodotto,
-                     final String descrizioneProdotto, final float prezzoOriginario,
-                     final String nome_prodotto, final String singolo, final String menu) {
+            final String descrizioneProdotto, final float prezzoOriginario,
+            final String nome_prodotto, final String singolo, final String menu) {
         super(disponibile, codice_prodotto, descrizioneProdotto, prezzoOriginario, nome_prodotto, singolo, menu);
         this.codiceMenu = codice_prodotto;
     }
@@ -27,8 +29,7 @@ public class ProdottoMenu extends Prodotto {
     public static class DAO {
 
         public static boolean insert(final Connection connection, String codice) {
-           try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_MENU.get())) {
-                preparedStatement.setString(1, codice);
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_MENU.get())) {
                 int rowsAffected = preparedStatement.executeUpdate();
                 return rowsAffected > 0;
             } catch (SQLException e) {
@@ -36,35 +37,52 @@ public class ProdottoMenu extends Prodotto {
             }
         }
 
+        public static Map<Pair<String, Integer>, List<String>> getIngredienti(final Connection connection,
+                final String codiceMenu) {
 
-        public static Map<String, List<String>> getIngredienti(final Connection connection, final String codiceMenu) {
+            Map<Pair<String, Integer>, String> listaProdotti = new LinkedHashMap<>();
+            Map<Pair<String, Integer>, List<String>> ingredientiMenu = new LinkedHashMap<>();
+            Map<String, List<String>> cacheIngredientiPerProdotto = new HashMap<>();
+            int countRig = 1;
 
-            Map<String, String> listaProdotti = new HashMap<>();
-            Map<String, List<String>> ingredientiMenu = new HashMap<>();
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_COMPONENTI_MENU_CATALOGO.get(),
+                    codiceMenu);
+                    var resultSet = preparedStatement.executeQuery()) {
 
-            try( var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_COMPONENTI_MENU_CATALOGO.get(), codiceMenu);
-                 var resultSet = preparedStatement.executeQuery();){
                 while (resultSet.next()) {
-                    var codice_prodotto = resultSet.getString("Codice_Prodotto");
+                    var codiceProdotto = resultSet.getString("Codice_Prodotto");
                     var nomeProdotto = resultSet.getString("Nome_Prodotto");
-                    listaProdotti.put(codice_prodotto, nomeProdotto);
+                    var quantita = resultSet.getInt("Quantita");
+
+                    for (int i = 0; i < quantita; i++) {
+                        listaProdotti.put(new Pair<>(codiceProdotto, countRig++), nomeProdotto);
+                    }
                 }
 
-                for (String codiceProdotto : listaProdotti.keySet()) {
-                    List<String> ingredientiProdotto = Ingrediente.DAO.getIngredienti(connection, codiceProdotto);
-                    ingredientiMenu.put(listaProdotti.get(codiceProdotto), ingredientiProdotto);
+                for (var entry : listaProdotti.entrySet()) {
+                    Pair<String, Integer> chiave = entry.getKey();
+                    String codiceProdotto = chiave.getFirst();
+                    String nomeProdotto = entry.getValue();
+
+                    List<String> ingredientiProdotto = cacheIngredientiPerProdotto.computeIfAbsent(
+                            codiceProdotto, cp -> Ingrediente.DAO.getIngredienti(connection, cp));
+                    System.out.println("Ingredienti per prodotto " + nomeProdotto + ": " + ingredientiProdotto);
+                    ingredientiMenu.put(new Pair<>(nomeProdotto, chiave.getSecond()), ingredientiProdotto);
                 }
+
             } catch (SQLException e) {
                 throw new DAOException(e);
             }
             return ingredientiMenu;
         }
 
-        public static boolean addProdottoToMenu(final Connection connection, final String codiceMenu, final String nomeProdotto, final int quantita) {
+        public static boolean addProdottoToMenu(final Connection connection, final String codiceMenu,
+                final String nomeProdotto, final int quantita) {
 
             String codiceProdotto = Prodotto.DAO.getCodbyNome(connection, nomeProdotto);
 
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_COMPOSTO_MENU.get(), codiceMenu, codiceProdotto, quantita)) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_COMPOSTO_MENU.get(), codiceMenu,
+                    codiceProdotto, quantita)) {
                 int rowsAffected = preparedStatement.executeUpdate();
                 System.out.println("PRODOTTO:" + nomeProdotto + " con quantità: " + quantita);
                 return rowsAffected > 0;
@@ -73,7 +91,7 @@ public class ProdottoMenu extends Prodotto {
             }
         }
 
-        public static String getLast(Connection connection){
+        public static String getLast(Connection connection) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_PRODOTTO.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -102,9 +120,11 @@ public class ProdottoMenu extends Prodotto {
         }
 
         public static boolean eliminaComprendeMenu(final Connection connection, final String codiceMenu) {
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get(), codiceMenu)) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get(),
+                    codiceMenu)) {
                 int rowsAffected = preparedStatement.executeUpdate();
-                System.out.println("PRODOTTO ELIMINA COMPRENDE: Eliminazione menu con codice: " + codiceMenu + ", " + rowsAffected + " righe interessate.");
+                System.out.println("PRODOTTO ELIMINA COMPRENDE: Eliminazione menu con codice: " + codiceMenu + ", "
+                        + rowsAffected + " righe interessate.");
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 throw new DAOException("Errore durante l'eliminazione del menu", e);
@@ -128,5 +148,26 @@ public class ProdottoMenu extends Prodotto {
             }
             return true;
         }
+
+        public static Map<String, Integer> getProdottiMenuQuantita(final Connection connection,
+                final String codiceMenu) {
+            Map<String, Integer> prodottiMenuQuantita = new HashMap<>();
+
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_PRODOTTI_MENU_QUANTITA.get(),
+                    codiceMenu);
+                    var resultSet = preparedStatement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String nomeProdotto = resultSet.getString("Nome_Prodotto");
+                    int quantita = resultSet.getInt("Quantita");
+                    prodottiMenuQuantita.put(nomeProdotto, quantita);
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero dei prodotti del menu con le relative quantità", e);
+            }
+
+            return prodottiMenuQuantita;
+        }
+
     }
 }

@@ -1,6 +1,9 @@
 package project.db.view.InformazioniAggregate;
 
 import javax.swing.*;
+
+import project.db.data.Pair;
+
 import java.awt.*;
 import java.util.Map;
 
@@ -13,16 +16,16 @@ public class MiglioriRider extends JDialog {
         this.setLocationRelativeTo(null);
     }
 
-    public void mostraClassifica(Map<String, String> classifica, Map<String, Integer> punteggi) {
-        this.setSize(700,700);
+    public void mostraClassifica(Map<Pair<String,String>, Pair<Float,Integer>> classifica) {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Classifica migliori rider:\n\n");
         int rank = 1;
-        for (Map.Entry<String, String> entry : classifica.entrySet()) {
-            sb.append(rank).append(". ").append(entry.getKey()).append(" - ").append(entry.getValue()).append(" (").append(punteggi.get(entry.getKey())).append(" punti)").append("\n");
+        for (Pair<String, String> entry : classifica.keySet()) {
+            Pair<Float,Integer> punteggi = classifica.get(entry);
+            sb.append(rank).append(". ").append(entry.getFirst()).append(" - ").append(entry.getSecond()).append(" (").append(punteggi.getFirst()).append(" punti, ").append(punteggi.getSecond()).append(" recensioni)").append("\n");
             rank++;
         }
         textArea.setText(sb.toString());

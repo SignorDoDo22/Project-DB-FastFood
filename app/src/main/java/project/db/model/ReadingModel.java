@@ -1,4 +1,5 @@
 package project.db.model;
+
 import project.db.data.Categoria;
 import java.sql.Connection;
 import project.db.data.RigaOrdine;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import project.db.data.Cliente;
 import project.db.data.InformazioniAggregate;
 import project.db.data.Ingrediente;
+import project.db.data.ModificaProdotto;
 import project.db.data.Ordine;
 import project.db.data.Pair;
 import project.db.data.Prodotto;
@@ -20,7 +22,7 @@ public class ReadingModel {
 
     private final Connection connection;
 
-    public ReadingModel(final Connection connection){
+    public ReadingModel(final Connection connection) {
         Objects.requireNonNull(connection, "Model created with null connection");
         this.connection = connection;
     }
@@ -29,7 +31,7 @@ public class ReadingModel {
         return Prodotto.DAO.list(connection);
     }
 
-    public List<String> loadIngredienti(final String Codice_Prodotto){
+    public List<String> loadIngredienti(final String Codice_Prodotto) {
         return Ingrediente.DAO.getIngredienti(connection, Codice_Prodotto);
     }
 
@@ -61,7 +63,7 @@ public class ReadingModel {
         return Ordine.DAO.listOrdiniRecensibili(connection, codiceUtente);
     }
 
-    public Map<String, List<String>> loadIngredientiMenu(final String codiceProdottoMenu) {
+    public Map<Pair<String, Integer>, List<String>> loadIngredientiMenu(final String codiceProdottoMenu) {
         return ProdottoMenu.DAO.getIngredienti(connection, codiceProdottoMenu);
     }
 
@@ -69,7 +71,7 @@ public class ReadingModel {
         return Ingrediente.DAO.getIngredientiWithQuantita(connection, codiceProdotto);
     }
 
-      public boolean isProdottoOrdinato(final String codiceProdotto) {
+    public boolean isProdottoOrdinato(final String codiceProdotto) {
         return Prodotto.DAO.isStatoOrdinato(connection, codiceProdotto);
     }
 
@@ -105,10 +107,6 @@ public class ReadingModel {
         return Ordine.DAO.getProssimoCodice(connection, "ORD", 3);
     }
 
-    public String getNextRigaCode() {
-        return RigaOrdine.DAO.getNextCodiceRiga(connection, "RIG");
-    }
-
     public boolean checkEmailRiderExists(final String email) {
         return Rider.DAO.checkEmailExists(connection, email);
     }
@@ -121,7 +119,34 @@ public class ReadingModel {
         return Categoria.DAO.checkNameCategoriaExists(connection, nomeCategoria);
     }
 
-    public Map<Pair<String,String>,Integer> getClassificaProdottiPiuVenduti() {
+    public Map<Pair<String, String>, Integer> getClassificaProdottiPiuVenduti() {
         return InformazioniAggregate.DAO.getClassificaProdottiPiuVenduti(connection);
     }
+
+    public Map<Pair<String, String>, Pair<Float, Integer>> getClassificaMiglioriRider() {
+        return InformazioniAggregate.DAO.getClassificaMiglioriRider(connection);
+    }
+
+    public Map<Pair<String, String>, Pair<Integer, Integer>> getRecensioniNegative() {
+        return InformazioniAggregate.DAO.getRecensioniNegative(connection);
+    }
+
+    public String getCodiceProdottoByNome(String nomeProdotto) {
+        return Prodotto.DAO.getCodbyNome(connection, nomeProdotto);
+    }
+
+    public String getCodiceIngredienteByNome(String nomeIngrediente) {
+        return Ingrediente.DAO.getIngredienteCodebyName(connection, nomeIngrediente);
+    }
+
+    public boolean controllaQuantitaIngrediente(String codiceIngrediente, int quantitaRichiesta,
+            String nomeProdotto) {
+        return ModificaProdotto.DAO.verificaQuantitaIngrediente(connection, codiceIngrediente, quantitaRichiesta,
+                getCodiceProdottoByNome(nomeProdotto));
+    }
+
+    public List<Ordine> loadOrdiniInPreparazione() {
+        return Ordine.DAO.listOrdiniByAdmin(connection);
+    }
+
 }

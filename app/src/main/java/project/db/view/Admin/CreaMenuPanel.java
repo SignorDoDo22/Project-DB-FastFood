@@ -103,6 +103,7 @@ public class CreaMenuPanel extends CreateProdottoPanel {
 
     public void caricaProdottiDisponibili(List<String> prodotti) {
         for (String prodotto : prodotti) {
+
             prodottiDisponibili.addItem(prodotto);
         }
     }

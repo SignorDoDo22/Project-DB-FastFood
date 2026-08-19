@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import project.db.controller.ControllerClientPanel;
+import project.db.data.Pair;
 import project.db.data.Prodotto;
 import project.db.view.MainView;
 import project.db.view.ProdottoCatalogo.ProdottoCard;
@@ -125,15 +126,15 @@ public class ClientPanel extends JPanel {
         controllerClientPanel.userRequestIngredientiMenu(codiceProdottoMenu);
     }
 
-    public void mostraIngredientiMenu(Map<String, List<String>> ingredientiMenu) {
+    public void mostraIngredientiMenu(Map<Pair<String, Integer>, List<String>> ingredientiMenu) {
         if (ingredientiMenu.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Nessun ingrediente trovato per il menu.");
             return;
         }
 
         StringBuilder testo = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : ingredientiMenu.entrySet()) {
-            String prodotto = entry.getKey();
+        for (Map.Entry<Pair<String, Integer>, List<String>> entry : ingredientiMenu.entrySet()) {
+            String prodotto = entry.getKey().getFirst();
             List<String> ingredienti = entry.getValue();
             testo.append(prodotto).append(": ").append(String.join(", ", ingredienti)).append("\n");
         }

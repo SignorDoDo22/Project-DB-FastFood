@@ -32,7 +32,7 @@ public class AdminPanel extends JPanel {
 
         this.setLayout(new BorderLayout(10, 10));
 
-        String[] colonne = {"Codice", "Nome", "Tipo", "Prezzo", "Disponibile"};
+        String[] colonne = { "Codice", "Nome", "Tipo", "Prezzo", "Disponibile" };
         this.tableModel = new DefaultTableModel(colonne, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -86,7 +86,7 @@ public class AdminPanel extends JPanel {
         JButton createProdottoButton = new JButton("Crea Prodotto");
         createProdottoButton.addActionListener(e -> {
 
-            Object[] options = {"Singolo", "Menu", "Annulla"};
+            Object[] options = { "Singolo", "Menu", "Annulla" };
 
             int result = JOptionPane.showOptionDialog(this, "Che tipo di prodotto vuoi creare?", "Crea Prodotto",
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
@@ -98,8 +98,7 @@ public class AdminPanel extends JPanel {
         form.add(createProdottoButton);
 
         JButton creaIngredienteButton = new JButton("Crea Ingrediente");
-        creaIngredienteButton.addActionListener(e -> this.controller.userRequestCreateIngredientePanel()
-        );
+        creaIngredienteButton.addActionListener(e -> this.controller.userRequestCreateIngredientePanel());
 
         form.add(creaIngredienteButton);
 
@@ -114,6 +113,7 @@ public class AdminPanel extends JPanel {
 
         JButton btnOrderStatus = new JButton("Gestisci ordini");
         this.add(btnOrderStatus, BorderLayout.SOUTH);
+        btnOrderStatus.addActionListener(e -> controller.userRequestedGestioneOrdiniPanel());
     }
 
     public void setController(final ControllerAdmin controller) {
@@ -123,7 +123,7 @@ public class AdminPanel extends JPanel {
     public void mostraCatalogo(final List<Prodotto> catalogo) {
         tableModel.setRowCount(0);
         for (Prodotto p : catalogo) {
-            tableModel.addRow(new Object[]{
+            tableModel.addRow(new Object[] {
                     p.getCodiceProdotto(), p.getNomeProdotto(),
                     p.isMenu() ? "Menu" : "Singolo",
                     p.getPrezzoOriginario(), p.isDisponibile()

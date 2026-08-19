@@ -38,38 +38,32 @@ public class Carrello extends JPanel {
 
     }
 
-    public void addRigaCarrello(String codiceProdotto, int quantita, String nomeProdotto, float prezzoUnitario, boolean menu){
+    public void addRigaCarrello(String codiceProdotto, int quantita, String nomeProdotto, float prezzoUnitario,
+            boolean menu) {
 
-        RigaCarrello rigaOrdine = new RigaCarrello(menu, prezzoUnitario, quantita, nomeProdotto, codiceProdotto, this);
+        Integer lungheza = righeCarrello.size();
+        System.out.println("Lunghezza righeCarrello: " + lungheza);
+        String codiceRiga = controllerClientPanel.generaProssimoCodiceRiga();
+        if (menu) {
+            RigaCarrelloMenu rigaOrdine = new RigaCarrelloMenu(menu, prezzoUnitario, quantita, nomeProdotto,
+                    codiceProdotto, this,
+                    controllerClientPanel, codiceRiga);
+            this.panelscorrevole.add(rigaOrdine);
+            this.righeCarrello.add(rigaOrdine);
+            this.revalidate();
+            this.repaint();
+
+            return;
+        }
+
+        RigaCarrello rigaOrdine = new RigaCarrelloSingolo(menu, prezzoUnitario, quantita, nomeProdotto, codiceProdotto,
+                this,
+                controllerClientPanel, codiceRiga);
+
         this.panelscorrevole.add(rigaOrdine);
-        righeCarrello.add(rigaOrdine);
+        this.righeCarrello.add(rigaOrdine);
         this.revalidate();
         this.repaint();
-    }
-
-    public void requestIngredientiPresenti(final RigaCarrello rigaCarrello){
-        controllerClientPanel.userRequestIngredientiFromRigaCarrello(rigaCarrello.getCodiceProdotto(), rigaCarrello);
-    }
-
-    /**
-     * Richiede al controller la composizione del menu (nome componente -> suoi
-     * ingredienti) associato a questa riga carrello, così l'utente può scegliere
-     * quale prodotto del menu modificare.
-     */
-    public void requestComponentiMenu(final RigaCarrello rigaCarrello) {
-        controllerClientPanel.userRequestComponentiMenu(rigaCarrello.getCodiceProdotto(), rigaCarrello);
-    }
-
-    /**
-     * Restituisce i nomi di tutti gli ingredienti disponibili a catalogo,
-     * usati per popolare la sezione "aggiungi ingrediente".
-     */
-    public List<String> requestIngredientiDisponibili() {
-        return controllerClientPanel.userRequestIngredientiDisponibili();
-    }
-
-    public List<RigaCarrello> getRigheCarrello() {
-        return righeCarrello;
     }
 
     public void rimuoviProdottoCarrello(RigaCarrello rigaCarrello) {
@@ -84,6 +78,10 @@ public class Carrello extends JPanel {
         righeCarrello.clear();
         this.revalidate();
         this.repaint();
+    }
+
+    public List<RigaCarrello> getRigheCarrello() {
+        return righeCarrello;
     }
 
 }

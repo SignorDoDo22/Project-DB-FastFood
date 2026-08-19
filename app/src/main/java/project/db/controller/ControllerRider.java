@@ -4,7 +4,7 @@ import project.db.data.Ordine;
 import project.db.data.Rider;
 import project.db.model.ReadingModel;
 import project.db.model.WritingModel;
-import project.db.view.Rider.OrdineRiderPanel;
+import project.db.view.Ordine.OrdinePanel;
 import project.db.view.Rider.RiderPanel;
 import javax.swing.JOptionPane;
 
@@ -18,59 +18,65 @@ public class ControllerRider {
     private RiderPanel riderPanel;
     private WritingModel writingModel;
     private Rider riderLoggato;
-    private OrdineRiderPanel ordinePresoInCarico;
-    private List<OrdineRiderPanel> ordiniPanels = new ArrayList<>();
+    private OrdinePanel ordinePresoInCarico;
+    private List<OrdinePanel> ordiniPanels = new ArrayList<>();
 
-    public ControllerRider(MainController mainController, ReadingModel modelReading, WritingModel writingModel, RiderPanel riderPanel) {
+    public ControllerRider(MainController mainController, ReadingModel modelReading, WritingModel writingModel,
+            RiderPanel riderPanel) {
         this.mainController = mainController;
         this.modelReading = modelReading;
         this.riderPanel = riderPanel;
         this.writingModel = writingModel;
     }
 
-    public void showOrders(){
+    public void showOrders() {
         List<Ordine> ordini = modelReading.loadOrdini();
         ordiniPanels.clear();
         System.out.println("Ordini caricati con successo: " + ordini.size());
         for (Ordine ordine : ordini) {
 
             if (ordine != null) {
-                ordiniPanels.add(new OrdineRiderPanel(
+                ordiniPanels.add(new OrdinePanel(
                         this,
                         ordine.getCodiceOrdine(),
                         ordine.getIndVia(),
-                        ordine.getIndCivico()
-                ));
+                        ordine.getIndCivico()));
             }
         }
         riderPanel.showOrdersReady(ordiniPanels);
     }
 
-    public void riderPrendeInCarico(OrdineRiderPanel ordineRiderPanel) {
-        this.ordinePresoInCarico = ordineRiderPanel;
-        writingModel.prendeInCaricoOrdine(ordineRiderPanel.getCodiceOrdine(), riderLoggato.getCodiceRider());
-        for (OrdineRiderPanel ordine : ordiniPanels) {
-            if (ordine != ordinePresoInCarico) {
-                ordine.setEnable(false);
-                ordine.repaint();
+    public void prendiInCaricoOrdine(OrdinePanel ordineRiderPanel) {
+
+        this.riderPanel.showInfoMessage("Ordine preso in carico !");
+
+        for (OrdinePanel ordinePanel : ordiniPanels) {
+            if (!ordinePanel.getCodiceOrdine().equals(ordineRiderPanel.getCodiceOrdine())) {
+                ordinePanel.enablePanel();
+            } else {
+                ordinePresoInCarico = ordinePanel;
             }
         }
     }
 
-    public void riderCompletaConsegna(OrdineRiderPanel ordineRiderPanel) {
+    public void consegnaOrdine(String codiceOrdine) {
 
-        int value = JOptionPane.showConfirmDialog(null, "Sei sicuro di voler completare la consegna?", "Conferma", JOptionPane.YES_NO_OPTION);
-        if (value == JOptionPane.YES_OPTION) {
-
-            if (ordinePresoInCarico == ordineRiderPanel) {
-                writingModel.riderCompletaConsegna(ordineRiderPanel.getCodiceOrdine());
-
-                this.showOrders();
-                this.ordinePresoInCarico = null;
-            }else{
-                JOptionPane.showMessageDialog(null, "Non puoi completare la consegna di un ordine che non hai preso in carico.", "Errore", JOptionPane.ERROR_MESSAGE);
-            }
+        if (ordinePresoInCarico == null) {
+            JOptionPane.showMessageDialog(riderPanel, "Nessun ordine è stato preso in carico.", "Errore",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        if (codiceOrdine.equals(ordinePresoInCarico.getCodiceOrdine())
+                && writingModel.aggiornaStatoOrdine(writingModel.getConnection(), codiceOrdine, "Consegnato")) {
+            this.riderPanel.showInfoMessage("Ordine consegnato con successo!");
+        } else {
+            this.riderPanel.showErrorMessage("Errore durante la consegna dell'ordine.");
+        }
+
+        showOrders();
+        ordinePresoInCarico = null;
+
     }
 
     public void setRiderLoggato(final Rider riderLoggato) {
