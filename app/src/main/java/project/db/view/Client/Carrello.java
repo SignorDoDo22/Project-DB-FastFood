@@ -41,8 +41,6 @@ public class Carrello extends JPanel {
     public void addRigaCarrello(String codiceProdotto, int quantita, String nomeProdotto, float prezzoUnitario,
             boolean menu) {
 
-        Integer lungheza = righeCarrello.size();
-        System.out.println("Lunghezza righeCarrello: " + lungheza);
         String codiceRiga = controllerClientPanel.generaProssimoCodiceRiga();
         if (menu) {
             RigaCarrelloMenu rigaOrdine = new RigaCarrelloMenu(menu, prezzoUnitario, quantita, nomeProdotto,

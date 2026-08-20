@@ -32,7 +32,7 @@ public class ControllerRider {
     public void showOrders() {
         List<Ordine> ordini = modelReading.loadOrdini();
         ordiniPanels.clear();
-        System.out.println("Ordini caricati con successo: " + ordini.size());
+
         for (Ordine ordine : ordini) {
 
             if (ordine != null) {
@@ -48,7 +48,15 @@ public class ControllerRider {
 
     public void prendiInCaricoOrdine(OrdinePanel ordineRiderPanel) {
 
-        this.riderPanel.showInfoMessage("Ordine preso in carico !");
+        ordinePresoInCarico = ordineRiderPanel;
+
+        if (this.writingModel.riderPrendeInCaricoOrdine(ordineRiderPanel.getCodiceOrdine(),
+                riderLoggato.getCodiceRider())) {
+            this.riderPanel.showInfoMessage("Ordine preso in carico con successo!");
+        } else {
+            this.riderPanel.showErrorMessage("Errore durante la presa in carico dell'ordine.");
+            return;
+        }
 
         for (OrdinePanel ordinePanel : ordiniPanels) {
             if (!ordinePanel.getCodiceOrdine().equals(ordineRiderPanel.getCodiceOrdine())) {
@@ -57,6 +65,8 @@ public class ControllerRider {
                 ordinePresoInCarico = ordinePanel;
             }
         }
+
+        this.riderPanel.disableRefreshButton();
     }
 
     public void consegnaOrdine(String codiceOrdine) {
@@ -74,7 +84,9 @@ public class ControllerRider {
             this.riderPanel.showErrorMessage("Errore durante la consegna dell'ordine.");
         }
 
+        writingModel.aggiornaGuadagnoRider(500, riderLoggato.getCodiceRider());
         showOrders();
+        this.riderPanel.enableRefreshButton();
         ordinePresoInCarico = null;
 
     }

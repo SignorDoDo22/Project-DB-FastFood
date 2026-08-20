@@ -2,7 +2,6 @@ package project.db.model;
 
 import project.db.data.Categoria;
 import java.sql.Connection;
-import project.db.data.RigaOrdine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -147,6 +146,10 @@ public class ReadingModel {
 
     public List<Ordine> loadOrdiniInPreparazione() {
         return Ordine.DAO.listOrdiniByAdmin(connection);
+    }
+
+    public String getRiderCodeByOrdine(String codiceOrdine) {
+        return Ordine.DAO.getRiderCodeByOrdine(connection, codiceOrdine);
     }
 
 }

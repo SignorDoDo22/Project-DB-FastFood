@@ -73,7 +73,6 @@ public class Ingrediente {
                 throw new DAOException("Errore nel caricamento degli ingredienti", e);
             }
 
-            System.out.println("PRODOTTO: Lunghezza ingredienti: " + ingredienti.size());
             return ingredienti;
         }
 
@@ -111,10 +110,8 @@ public class Ingrediente {
         public static boolean insert(final Connection connection, final String nomeIngrediente,
                 final Map<String, Boolean> ingredientiPresentiCheckBox) {
 
-            System.out.println("PRODOTTO: Inserimento ingrediente: " + nomeIngrediente);
-
             if (check(connection, nomeIngrediente)) {
-                System.out.println("PRODOTTO: Ingrediente già presente: " + nomeIngrediente);
+
                 return false;
             }
 
@@ -171,7 +168,7 @@ public class Ingrediente {
             } catch (SQLException e) {
                 throw new DAOException("Errore durante il recupero degli ingredienti del prodotto", e);
             }
-            System.out.println("PRODOTTO: Lunghezza ingredienti: " + listaIngredienti.size());
+
             return listaIngredienti;
         }
 
@@ -184,7 +181,7 @@ public class Ingrediente {
 
                 try (var result = preparedStatement.executeQuery()) {
                     while (result.next()) {
-                        System.out.println("PRODOTTO: Ingrediente trovato: " + result.getString("nome_ingrediente"));
+
                         listaIngredienti.add(result.getString("nome_ingrediente"));
                     }
                 }
@@ -192,7 +189,7 @@ public class Ingrediente {
             } catch (SQLException e) {
                 throw new DAOException("Errore durante il recupero degli ingredienti del prodotto", e);
             }
-            System.out.println("PRODOTTO (LISTA): Lunghezza ingredienti: " + listaIngredienti.size());
+
             return listaIngredienti;
         }
 

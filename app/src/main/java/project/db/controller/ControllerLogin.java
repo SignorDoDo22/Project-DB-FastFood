@@ -35,14 +35,13 @@ public class ControllerLogin {
         var data = loginPanelClient.getUserData();
         var email = data.get("email").getText();
         var password = data.get("password").getText();
-        System.out.println("Email: " + email);
-        System.out.println("Password: " + password);
-        if(modelReading.findClient(email, password)){
+
+        if (modelReading.findClient(email, password)) {
             this.utente = modelReading.getCliente(email, password);
             this.mainController.setClientLoggedIn(utente);
             this.mainView.requestChangePanel("client", "login");
         } else {
-            System.out.println("Utente non trovato");
+
             this.utente = null;
         }
         return this.utente != null;
@@ -53,9 +52,8 @@ public class ControllerLogin {
         var data = loginPanelRider.getUserData();
         var email = data.get("email").getText();
         var password = data.get("password").getText();
-        System.out.println("Email: " + email);
-        System.out.println("Password: " + password);
-        if(modelReading.findRider(email, password)){
+
+        if (modelReading.findRider(email, password)) {
             this.rider = modelReading.getRider(email, password);
             this.mainController.setRiderLoggedIn(rider);
             this.mainView.requestChangePanel("rider", "login");
@@ -69,8 +67,7 @@ public class ControllerLogin {
         this.mainController.changePanel(panelName, currentPanel);
     }
 
-
-    public void logOut(){
+    public void logOut() {
         this.utente = null;
     }
 

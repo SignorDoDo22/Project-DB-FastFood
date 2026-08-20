@@ -54,7 +54,7 @@ public class ControllerClientPanel {
         try {
             final var prodotti = this.modelReading.loadProdotti();
             this.clientPanel.showCatalogo(prodotti);
-            System.out.println("Catalogo caricato con successo");
+
         } catch (final DAOException e) {
             e.printStackTrace();
         }
@@ -62,7 +62,6 @@ public class ControllerClientPanel {
 
     public void userRequestIngredientiProd(final String codice_prodotto) {
 
-        System.out.println("Richiesta ingredienti per il prodotto con codice: " + codice_prodotto);
         final var ingredienti = this.modelReading.loadIngredienti(codice_prodotto);
         this.clientPanel.mostraIngredienti(ingredienti);
     }
@@ -70,7 +69,6 @@ public class ControllerClientPanel {
     public void userRequestOrdiniRecensibili() {
         final var ordiniRecensibili = this.modelReading
                 .loadOrdiniRecensibili(this.mainController.getControllerLogin().getUtente().getCodiceUtente());
-        System.out.println("Ordini recensibili caricati con successo: " + ordiniRecensibili.size());
         this.recensioniPanel.mostraRecensioni(ordiniRecensibili);
     }
 
@@ -79,11 +77,6 @@ public class ControllerClientPanel {
 
     }
 
-    /**
-     * Richiede la composizione di un menu (nome componente -> suoi ingredienti)
-     * per una specifica riga del carrello, così l'utente può scegliere quale
-     * prodotto contenuto nel menu vuole modificare.
-     */
     public void userRequestComponentiMenu(final String codiceProdottoMenu, final RigaCarrelloMenu rigaCarrello) {
         final Map<Pair<String, Integer>, List<String>> componenti = this.modelReading
                 .loadIngredientiMenu(codiceProdottoMenu);
@@ -106,8 +99,6 @@ public class ControllerClientPanel {
         }
         if (riga instanceof RigaCarrelloMenu) {
             RigaCarrelloMenu rigaMenu = (RigaCarrelloMenu) riga;
-            System.out.println("SONO DENTRO INSTANCEOF " + rigaMenu.getNomeProdotto() + " -> "
-                    + nomiIngredienti);
             rigaMenu.mostraIngredientiDisponibili(nomiIngredienti);
         } else {
             riga.mostraIngredientiDisponibili(nomiIngredienti);
@@ -121,12 +112,13 @@ public class ControllerClientPanel {
         } else {
             userRequestIngredientiDisponibili(riga);
         }
-        System.out.println("Riga selezionata per la modifica: " + riga.getCodiceProdotto());
+
     }
 
     public void userRequestCreateRecensione(String codiceOrdine, int votoRider, int votoOrdine,
             String testoRecensione) {
         this.modelWriting.inserisciRecensione(codiceOrdine, testoRecensione, votoOrdine, votoRider);
+        this.modelWriting.aggiornaRaitingRider(votoRider, this.modelReading.getRiderCodeByOrdine(codiceOrdine));
     }
 
     public boolean userCreateOrdine() {
@@ -141,20 +133,19 @@ public class ControllerClientPanel {
 
             final boolean ordineCreato = this.modelWriting.createOrdine(datiDomicilio, codiceUtente, codiceOrdine);
             if (!ordineCreato) {
-                System.out.println("Creazione ordine fallita per codice: " + codiceOrdine);
+
                 conn.rollback();
                 return false;
             }
 
             if (this.modelWriting.aggiornaStatoOrdine(conn, codiceOrdine, "In Preparazione")) {
-                System.out.println("Stato ordine inserito con successo per codice: " + codiceOrdine);
+
             } else {
-                System.out.println("Inserimento stato ordine fallito per codice: " + codiceOrdine);
+
                 conn.rollback();
                 return false;
             }
 
-            System.out.println(carrello.getRigheCarrello().size() + " prodotti singoli nel carrello");
             for (final RigaCarrello riga : carrello.getRigheCarrello()) {
 
                 final boolean rigaInserita = this.modelWriting.createRigaOrdine(
@@ -166,7 +157,7 @@ public class ControllerClientPanel {
                         riga.getCodiceRiga());
 
                 if (!rigaInserita) {
-                    System.out.println("Inserimento riga fallito per il prodotto: " + riga.getCodiceProdotto());
+
                     conn.rollback();
                     return false;
                 }
@@ -176,12 +167,8 @@ public class ControllerClientPanel {
                     modelWriting.inserireMenuRiga(conn, codiceOrdine, riga.getCodiceRiga(), riga.getCodiceProdotto());
                     RigaCarrelloMenu rigaMenu = (RigaCarrelloMenu) riga;
                     Map<Integer, String> componentiMenu = rigaMenu.getComponentiMenu();
-                    System.out
-                            .println("Componenti menu per la riga: " + riga.getCodiceRiga() + " -> " + componentiMenu);
                     for (Map.Entry<Integer, String> entry : componentiMenu.entrySet()) {
                         String codiceProdotto = modelReading.getCodiceProdottoByNome(entry.getValue());
-                        System.out.println("Inserimento componente menu per riga: " + riga.getCodiceRiga()
-                                + ", prodotto: " + codiceProdotto + ", numRowComp: " + entry.getKey());
                         this.modelWriting.inserisciCompMenuRiga(conn, codiceOrdine, riga.getCodiceRiga(),
                                 codiceProdotto,
                                 entry.getKey());
@@ -190,9 +177,7 @@ public class ControllerClientPanel {
                     Map<Pair<String, Integer>, Map<String, Pair<String, Integer>>> ingredientiModificati = rigaMenu
                             .getIngredientiModificati();
                     for (Pair<String, Integer> prodotto : ingredientiModificati.keySet()) {
-                        String nomeProdotto = prodotto.getFirst();
                         Integer numRowComp = prodotto.getSecond();
-                        System.out.println("NUMROW: " + numRowComp + " PRODOTTO: " + nomeProdotto);
                         Map<String, Pair<String, Integer>> modifiche = ingredientiModificati.get(prodotto);
                         for (String modifica : modifiche.keySet()) {
 
@@ -217,6 +202,8 @@ public class ControllerClientPanel {
                         String nomeIngrediente = entry.getKey();
                         String tipo = entry.getValue().getFirst();
                         Integer quantita = entry.getValue().getSecond();
+                        modelWriting.inserisciModificaRigSingolo(conn, codiceOrdine, rigaSingolo.getCodiceRiga(),
+                                modelReading.getCodiceIngredienteByNome(nomeIngrediente), quantita, tipo);
                     }
 
                 }
@@ -225,7 +212,6 @@ public class ControllerClientPanel {
 
             conn.commit();
             carrello.svuotaCarrello();
-            System.out.println("Ordine " + codiceOrdine + " creato con successo");
             return true;
 
         } catch (final DAOException | SQLException e) {
@@ -247,7 +233,6 @@ public class ControllerClientPanel {
 
     public String generaProssimoCodiceRiga() {
         int numero = carrello.getRigheCarrello().size() + 1;
-        System.out.println("Prossimo codice riga generato: R" + String.format("%03d", numero));
         return String.format("R%03d", numero);
     }
 

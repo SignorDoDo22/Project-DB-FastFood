@@ -114,8 +114,7 @@ public class ControllerAdmin {
         try {
 
             if (this.modelReading.isProdottoMenu(codiceProdotto)) {
-                System.out.println("Il prodotto con codice " + codiceProdotto
-                        + " è un menu, procedo con l'eliminazione dal menu.");
+
                 if (this.modelReading.isProdottoOrdinato(codiceProdotto)) {
                     boolean vuoleSoftDelete = adminPanel.chiediSoftDelete(
                             "Questo prodotto e' gia' stato ordinato in passato, non puo' essere eliminato. "
@@ -204,7 +203,7 @@ public class ControllerAdmin {
     public void showCreateProdottoPanel(int val) {
 
         if (val == 0) {
-            System.out.println("Mostro il pannello di creazione prodotto singolo");
+
             this.createProdottoPanel.caricaCategoriePossibili(modelReading.loadCategorie());
             List<String> ingredientiDisponibili = new ArrayList<>();
             for (Ingrediente prodotto : modelReading.loadIngredientiDisponibili()) {

@@ -2,7 +2,7 @@ package project.db.data;
 
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.sql.Connection;
@@ -66,7 +66,7 @@ public class ProdottoMenu extends Prodotto {
 
                     List<String> ingredientiProdotto = cacheIngredientiPerProdotto.computeIfAbsent(
                             codiceProdotto, cp -> Ingrediente.DAO.getIngredienti(connection, cp));
-                    System.out.println("Ingredienti per prodotto " + nomeProdotto + ": " + ingredientiProdotto);
+
                     ingredientiMenu.put(new Pair<>(nomeProdotto, chiave.getSecond()), ingredientiProdotto);
                 }
 
@@ -84,7 +84,6 @@ public class ProdottoMenu extends Prodotto {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_COMPOSTO_MENU.get(), codiceMenu,
                     codiceProdotto, quantita)) {
                 int rowsAffected = preparedStatement.executeUpdate();
-                System.out.println("PRODOTTO:" + nomeProdotto + " con quantità: " + quantita);
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 throw new DAOException(e);
@@ -123,8 +122,6 @@ public class ProdottoMenu extends Prodotto {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.ELIMINA_DA_COMPOSTO_MENU.get(),
                     codiceMenu)) {
                 int rowsAffected = preparedStatement.executeUpdate();
-                System.out.println("PRODOTTO ELIMINA COMPRENDE: Eliminazione menu con codice: " + codiceMenu + ", "
-                        + rowsAffected + " righe interessate.");
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 throw new DAOException("Errore durante l'eliminazione del menu", e);

@@ -77,8 +77,6 @@ public class Selezionacomponentemenupanel extends JDialog {
         if (componenti != null) {
             for (Pair<String, Integer> nomeComponente : componenti.keySet()) {
                 componentiComboBox.addItem(nomeComponente.getFirst());
-                System.out.println("Caricato componente menu: " + nomeComponente.getFirst() + ", numRowComp: "
-                        + nomeComponente.getSecond());
             }
         }
     }

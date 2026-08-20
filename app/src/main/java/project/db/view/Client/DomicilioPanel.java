@@ -83,7 +83,7 @@ public class DomicilioPanel extends JDialog {
     public Map<String, String> getCampiDomicilio() {
         Map<String, String> datiDomicilio = new HashMap<>();
         for (Map.Entry<String, TextField> entry : campiDomicilio.entrySet()) {
-            System.out.println("Campo: " + entry.getKey() + ", Valore: " + entry.getValue().getText());
+
             datiDomicilio.put(entry.getKey(), entry.getValue().getText());
         }
         return datiDomicilio;

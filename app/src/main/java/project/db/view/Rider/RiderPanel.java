@@ -2,12 +2,10 @@ package project.db.view.Rider;
 
 import java.util.List;
 import java.awt.BorderLayout;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import project.db.controller.ControllerRider;
 import project.db.view.MainView;
 import project.db.view.Ordine.OrdinePanel;
@@ -39,7 +37,7 @@ public class RiderPanel extends JPanel {
         this.add(southPanel, BorderLayout.SOUTH);
 
         this.buttonRefresh.addActionListener(e -> this.controllerRider.showOrders());
-        this.buttonIndietro.addActionListener(e -> mainView.changePanel("scelta"));
+        this.buttonIndietro.addActionListener(e -> this.mainView.changePanel("scelta"));
     }
 
     public void showOrdersReady(List<OrdinePanel> ordini) {
@@ -63,5 +61,13 @@ public class RiderPanel extends JPanel {
     public void showInfoMessage(String message) {
         javax.swing.JOptionPane.showMessageDialog(this, message, "Informazione",
                 javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void disableRefreshButton() {
+        this.buttonRefresh.setEnabled(false);
+    }
+
+    public void enableRefreshButton() {
+        this.buttonRefresh.setEnabled(true);
     }
 }

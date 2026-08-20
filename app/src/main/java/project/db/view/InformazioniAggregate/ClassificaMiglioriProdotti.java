@@ -29,11 +29,10 @@ public class ClassificaMiglioriProdotti extends JDialog {
 
     }
 
-    public void mostraClassificaProdottiPiuVenduti(Map<Pair<String,String>,Integer> classifica) {
+    public void mostraClassificaProdottiPiuVenduti(Map<Pair<String, String>, Integer> classifica) {
 
-        for (Map.Entry<Pair<String,String>, Integer> entry : classifica.entrySet()) {
-            System.out.println("Prodotto: " + entry.getKey().getFirst() + " - " + entry.getKey().getSecond() + ", Quantità venduta: " + entry.getValue());
-            Pair<String,String> prodotto = entry.getKey();
+        for (Map.Entry<Pair<String, String>, Integer> entry : classifica.entrySet()) {
+            Pair<String, String> prodotto = entry.getKey();
             Integer quantitaVenduta = entry.getValue();
             JTextArea textArea = new JTextArea();
             textArea.setEditable(false);

@@ -149,14 +149,14 @@ public enum Queries {
                         """),
 
         AGGIORNA_MEDIA_RIDER("""
-                        UPDATE Rider
+                        update rider
                         SET RaitingMedioRider = (
-                        SELECT AVG(r.Voto_Rider)
-                        FROM Recensione r
-                        JOIN Prende_in_carico p ON p.Codice_Ordine = r.Codice_Ordine
-                        WHERE p.Codice_Rider = ?
+                        select avg(Voto_Rider)
+                        from recensione as r
+                        inner join ordine as o on r.Codice_Ordine = o.Codice_Ordine
+                        where Codice_Rider = ?
                         )
-                        WHERE Codice_Rider = ?
+                        where Codice_rider = ?
                         """),
 
         MOSTRA_ULTIMO_RIDER_CODICE("""
@@ -165,7 +165,7 @@ public enum Queries {
 
         AGGIORNA_GUADAGNO_TOTALE_RIDER("""
                         UPDATE Rider
-                        SET GuadagnoTotale = GuadagnoTotale + ?
+                        SET Guadagno = Guadagno + ?
                         WHERE Codice_Rider = ?;
                         """),
 
@@ -442,6 +442,11 @@ public enum Queries {
                         INSERT INTO Stato_Ordine (Codice_Ordine, Stato, Tempo)
                         VALUES (?, ?, ?)
                         """),
+        GET_RIDER_CODE_BY_ORDINE("""
+                        SELECT Codice_Rider
+                        FROM Ordine
+                        WHERE Codice_Ordine = ?
+                        """),
 
         // =================================================
         // RIGA_PRODOTTO (+ sottotipi)
@@ -490,10 +495,11 @@ public enum Queries {
         // PERSONALIZZAZIONI (Modifica*)
         // =================================================
 
-        INSERIRE_MODIFICA_PRODOTTO_SINGOLO("""
-                        INSERT INTO ModificaProdottoSingolo (Codice_Ordine, CodiceRiga, Codice_Ingrediente, Tipo)
-                        VALUES (?, ?, ?, ?)
-                        """),
+        INSERIRE_MODIFICA_PRODOTTO_SINGOLO(
+                        """
+                                        INSERT INTO ModificaProdottoSingolo (Codice_Ordine, CodiceRiga, Codice_Ingrediente, Tipo, Quantita)
+                                        VALUES (?, ?, ?, ?, ?)
+                                        """),
 
         INSERIRE_MODIFICA_COMPONENTE_MENU(
                         """

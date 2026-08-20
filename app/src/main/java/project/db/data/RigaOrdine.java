@@ -3,7 +3,6 @@ package project.db.data;
 import project.db.Queries;
 import project.db.controller.DAOException;
 import project.db.controller.DAOUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RigaOrdine {
 
@@ -146,7 +144,6 @@ public class RigaOrdine {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_RIGAPRODOTTOMENU.get(),
                     codiceOrdine, codiceRiga, codiceProdotto)) {
                 int rowsAffected = preparedStatement.executeUpdate();
-                System.out.println("Riga menu inserita: " + rowsAffected + " righe interessate.");
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 throw new DAOException(e);
@@ -156,15 +153,11 @@ public class RigaOrdine {
         public static boolean InserisciCompMenuRiga(Connection connection, String codiceOrdine, String codiceRiga,
                 String codiceProdotto, Integer numRowCompMenu) {
             try (var psComponente = DAOUtils.prepare(connection, Queries.INSERIRE_COMPONENTE_MENU_ORDINATO.get())) {
-                System.out.println(
-                        "Inserimento componente menu: codiceOrdine=" + codiceOrdine + ", codiceRiga=" + codiceRiga
-                                + ", numRowCompMenu=" + numRowCompMenu + ", codiceProdotto=" + codiceProdotto);
                 psComponente.setString(1, codiceOrdine);
                 psComponente.setString(2, codiceRiga);
                 psComponente.setInt(3, numRowCompMenu);
                 psComponente.setString(4, codiceProdotto);
                 int rowsAffected = psComponente.executeUpdate();
-                System.out.println("Riga componente menu inserita: " + rowsAffected + " righe interessate.");
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 throw new DAOException(e);

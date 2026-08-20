@@ -6,9 +6,8 @@ import project.db.data.Categoria;
 import project.db.data.Cliente;
 import project.db.data.CompRigaOrdineMenu;
 import project.db.data.Ingrediente;
-import project.db.data.ModificaProdotto;
+import project.db.data.ModificaProdottoSingolo;
 import project.db.data.Ordine;
-import project.db.data.Pair;
 import project.db.data.Prodotto;
 import project.db.data.ProdottoMenu;
 import project.db.data.Rider;
@@ -135,8 +134,11 @@ public class WritingModel {
         return RigaOrdine.DAO.InserisciCompMenuRiga(connection, codiceOrdine, codiceRiga, codiceProdotto, numRowComp);
     }
 
-    public boolean inserisciModificaRigSingolo(Connection connection, String codiceOrdine, String codiceRiga) {
-        return false; // String codiceIngrediente, int quantita, String tipo) {
+    public boolean inserisciModificaRigSingolo(Connection connection, String codiceOrdine, String codiceRiga,
+            String codiceIngrediente,
+            int quantita, String tipo) {
+        return ModificaProdottoSingolo.DAO.insertModificaProdottoSingolo(connection, codiceOrdine, codiceRiga,
+                codiceIngrediente, quantita, tipo);
 
     }
 
@@ -153,6 +155,14 @@ public class WritingModel {
 
     public boolean aggiornaStatoOrdine(Connection connection, String codiceOrdine, String nuovoStato) {
         return Stato_Ordine.DAO.updateOrdineStato(connection, codiceOrdine, nuovoStato);
+    }
+
+    public void aggiornaRaitingRider(int votoRider, String codiceRider) {
+        Rider.DAO.aggiornaRaitingMedio(codiceRider, votoRider, connection);
+    }
+
+    public void aggiornaGuadagnoRider(float guadagno, String codiceRider) {
+        Rider.DAO.aggiornaGuadagno(guadagno, connection, codiceRider);
     }
 
 }

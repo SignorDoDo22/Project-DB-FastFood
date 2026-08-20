@@ -17,7 +17,7 @@ public class SceltaLogin extends JPanel {
     private JButton informationButton;
     private MainView mainView;
 
-    public SceltaLogin(final MainView mainView){
+    public SceltaLogin(final MainView mainView) {
 
         this.setVisible(true);
         this.mainView = mainView;
@@ -31,18 +31,20 @@ public class SceltaLogin extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
 
-
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         this.add(adminButton, gbc);
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         this.add(clientButton, gbc);
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         this.add(riderButton, gbc);
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         this.add(informationButton, gbc);
 
         gbc.anchor = GridBagConstraints.CENTER;
-
 
         this.clientButton.addActionListener(new ActionListener() {
 
@@ -76,9 +78,9 @@ public class SceltaLogin extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Object[] scelte = {"ClassificaProdottiPiuVenduti", "MiglioriRider", "RecensioniNegative"};
+                Object[] scelte = { "ClassificaProdottiPiuVenduti", "MiglioriRider", "RecensioniNegative" };
 
-                    int response = javax.swing.JOptionPane.showOptionDialog(
+                int response = javax.swing.JOptionPane.showOptionDialog(
                         null,
                         "Cosa vuoi visualizzare?",
                         "Informazioni aggregate",
@@ -86,15 +88,17 @@ public class SceltaLogin extends JPanel {
                         javax.swing.JOptionPane.QUESTION_MESSAGE,
                         null,
                         scelte,
-                        scelte[0]
-                    );
+                        scelte[0]);
 
-                    mainView.requestInformazioniAggregate(scelte[response].toString());
-                }
+                mainView.requestInformazioniAggregate(scelte[response].toString());
+            }
 
+        });
 
-            });
+    }
 
+    public MainView getMainView() {
+        return mainView;
     }
 
 }

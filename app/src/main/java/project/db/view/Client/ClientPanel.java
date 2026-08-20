@@ -43,7 +43,6 @@ public class ClientPanel extends JPanel {
         this.pannelloCentrale = new JScrollPane(pannelScorrevole);
         this.add(pannelloCentrale, BorderLayout.CENTER);
 
-
         this.pannelloInferiore = new JPanel();
         this.pannelloInferiore.setLayout(new GridLayout(1, 3));
 
@@ -86,25 +85,25 @@ public class ClientPanel extends JPanel {
         });
     }
 
-    public void showCatalogo(List<Prodotto> prodotti){
-        System.out.println("Mostro catalogo con " + prodotti.size() + " prodotti");
+    public void showCatalogo(List<Prodotto> prodotti) {
+
         this.pannelScorrevole.removeAll();
-        for(Prodotto p : prodotti){
-            System.out.println("Aggiungo prodotto: " + p.getNomeProdotto());
+        for (Prodotto p : prodotti) {
+
             this.pannelScorrevole.add(new ProdottoCard(p.getCodiceProdotto(), p.getNomeProdotto(),
-            p.getPrezzoOriginario(), p.isDisponibile(), p.getMenu(), this));
+                    p.getPrezzoOriginario(), p.isDisponibile(), p.getMenu(), this));
         }
     }
 
-    public void requestIngredienti(String codice_prodotto){
+    public void requestIngredienti(String codice_prodotto) {
         controllerClientPanel.userRequestIngredientiProd(codice_prodotto);
     }
 
-    public List<String> getIngredientiProdotto(List<String> ingredienti){
-        return  ingredienti;
+    public List<String> getIngredientiProdotto(List<String> ingredienti) {
+        return ingredienti;
     }
 
-    public void setController(final ControllerClientPanel controllerClientPanel){
+    public void setController(final ControllerClientPanel controllerClientPanel) {
         Objects.requireNonNull(controllerClientPanel);
         this.controllerClientPanel = controllerClientPanel;
     }
@@ -122,7 +121,7 @@ public class ClientPanel extends JPanel {
         JOptionPane.showMessageDialog(this, "Ingredienti: " + testo.toString());
     }
 
-    public void requestIngredientiMenu(String codiceProdottoMenu){
+    public void requestIngredientiMenu(String codiceProdottoMenu) {
         controllerClientPanel.userRequestIngredientiMenu(codiceProdottoMenu);
     }
 
@@ -142,29 +141,27 @@ public class ClientPanel extends JPanel {
         JOptionPane.showMessageDialog(this, "Ingredienti del menu:\n" + testo.toString());
     }
 
-    public void addRigaCarrello(int quantita, String codiceProdotto, String nomeProdotto, float prezzoUnitario, boolean menu) {
+    public void addRigaCarrello(int quantita, String codiceProdotto, String nomeProdotto, float prezzoUnitario,
+            boolean menu) {
         carrello.addRigaCarrello(codiceProdotto, quantita, nomeProdotto, prezzoUnitario, menu);
     }
 
-    public void setCarrelloPanel(Carrello carrello){
+    public void setCarrelloPanel(Carrello carrello) {
         this.carrello = carrello;
-        System.out.println("Carrello panel set in ClientPanel");
         this.add(carrello, BorderLayout.EAST);
     }
 
-    public void setRecensioniPanel(RecensioniPanel recensioniPanel){
+    public void setRecensioniPanel(RecensioniPanel recensioniPanel) {
         this.recensioniPanel = recensioniPanel;
         this.add(recensioniPanel, BorderLayout.WEST);
     }
 
-    public void setControllerClientPanel(ControllerClientPanel controllerClientPanel){
+    public void setControllerClientPanel(ControllerClientPanel controllerClientPanel) {
         this.controllerClientPanel = controllerClientPanel;
     }
 
     public void createRecensioni(String numOrdine, int votoRider, int votoOrdine, String testoRecensione) {
         controllerClientPanel.userRequestCreateRecensione(numOrdine, votoRider, votoOrdine, testoRecensione);
     }
-
-
 
 }

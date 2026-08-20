@@ -1,4 +1,5 @@
 package project.db.view.Client;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,7 +20,6 @@ public class RecensioniPanel extends JPanel {
     private ClientPanel clientPanel;
     private ControllerClientPanel controllerClient;
 
-
     public RecensioniPanel(final ClientPanel clientPanel, final ControllerClientPanel controllerClient) {
 
         this.setLayout(new BorderLayout());
@@ -34,14 +34,14 @@ public class RecensioniPanel extends JPanel {
 
     }
 
-    public void refresh(){
+    public void refresh() {
         this.controllerClient.userRequestOrdiniRecensibili();
     }
 
     public void mostraRecensioni(List<Ordine> ordini) {
-        System.out.println("RecensioniPanel: ordini recensibili: " + ordini.size());
+
         panneloScorrevole.removeAll();
-        for(Ordine ordine : ordini){
+        for (Ordine ordine : ordini) {
             CardRecensione cardRecensione = new CardRecensione(ordine.getCodiceOrdine(), clientPanel, this);
             panneloScorrevole.add(cardRecensione);
         }

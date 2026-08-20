@@ -119,8 +119,6 @@ public class Categoria {
                 numero = Integer.parseInt(parteNumerica) + 1;
             }
 
-            System.out.println(
-                    "Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
         }
 

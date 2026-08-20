@@ -11,8 +11,8 @@ public class ProdottoSingolo extends Prodotto {
     private String codiceIngrediente;
 
     public ProdottoSingolo(final boolean disponibile, final String codice_prodotto,
-                     final String descrizioneProdotto, final float prezzoOriginario,
-                     final String nome_prodotto, final String singolo, final String menu) {
+            final String descrizioneProdotto, final float prezzoOriginario,
+            final String nome_prodotto, final String singolo, final String menu) {
         super(disponibile, codice_prodotto, descrizioneProdotto, prezzoOriginario, nome_prodotto, singolo, menu);
         this.codiceIngrediente = codice_prodotto;
     }
@@ -20,7 +20,6 @@ public class ProdottoSingolo extends Prodotto {
     public String getCodiceIngrediente() {
         return codiceIngrediente;
     }
-
 
     public static class DAO {
 
@@ -33,7 +32,7 @@ public class ProdottoSingolo extends Prodotto {
             return true;
         }
 
-        public static String getLast(Connection connection){
+        public static String getLast(Connection connection) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_SINGOLO.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -61,11 +60,12 @@ public class ProdottoSingolo extends Prodotto {
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
         }
 
-        public static boolean addIngredienteToProdotto(final Connection connection, final String codiceProdotto, final String nomeIngrediente, int quantita) {
+        public static boolean addIngredienteToProdotto(final Connection connection, final String codiceProdotto,
+                final String nomeIngrediente, int quantita) {
 
             String codiceIngrediente = Ingrediente.DAO.getIngredienteCodebyName(connection, nomeIngrediente);
-            System.out.println("PRODOTTO: Aggiunta ingrediente: " + nomeIngrediente + " con codice: " + codiceIngrediente + " al prodotto con codice: " + codiceProdotto);
-            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_COMPRENDE.get(), codiceIngrediente, codiceProdotto, quantita)) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_COMPRENDE.get(),
+                    codiceIngrediente, codiceProdotto, quantita)) {
                 int rowsAffected = preparedStatement.executeUpdate();
                 return rowsAffected > 0;
             } catch (SQLException e) {
@@ -73,7 +73,7 @@ public class ProdottoSingolo extends Prodotto {
             }
         }
 
-         public static void eliminaProdottoSingolo(final Connection connection, final String codiceProdotto) {
+        public static void eliminaProdottoSingolo(final Connection connection, final String codiceProdotto) {
             try {
                 connection.setAutoCommit(false);
 

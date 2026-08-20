@@ -21,7 +21,8 @@ public class MainController {
     private final ControllerRegistrazione controllerRegistrazione;
     private ControllerInformazioniAggregate controllerInformazioniAggregate;
 
-    public MainController(final ReadingModel modelReading, final WritingModel writingModel, final Connection connection){
+    public MainController(final ReadingModel modelReading, final WritingModel writingModel,
+            final Connection connection) {
 
         this.modelReading = modelReading;
         this.writingModel = writingModel;
@@ -41,65 +42,59 @@ public class MainController {
 
     public void changePanel(final String panelName, final String currentPanel) {
 
-        if("scelta".equals(panelName)) {
+        if ("scelta".equals(panelName)) {
             mainView.changePanel(panelName);
         }
 
-        if(panelName.equals("loginRider") || panelName.equals("loginClient")) {
+        if (panelName.equals("loginRider") || panelName.equals("loginClient")) {
             mainView.changePanel(panelName);
         }
 
-        if(currentPanel.equals("scelta") && panelName.equals("loginRider")) {
+        if (currentPanel.equals("scelta") && panelName.equals("loginRider")) {
             mainView.changePanel(panelName);
         }
 
-        if(currentPanel.equals("scelta") && panelName.equals("loginClient")) {
+        if (currentPanel.equals("scelta") && panelName.equals("loginClient")) {
             mainView.changePanel(panelName);
         }
 
-        if("client".equals(panelName)) {
+        if ("client".equals(panelName)) {
             mainView.changePanel(panelName);
             this.controllerClient.userRequestOrdiniRecensibili();
             this.controllerClient.userRequestedCatalogo();
         }
 
-        if("rider".equals(panelName)) {
+        if ("rider".equals(panelName)) {
             mainView.changePanel(panelName);
             this.controllerRider.showOrders();
         }
 
-        if("registrationRider".equals(panelName) && currentPanel.equals("loginRider")) {
-            System.out.println("cambio pannello registrazione");
+        if ("registrationRider".equals(panelName) && currentPanel.equals("loginRider")) {
             mainView.changePanel(panelName);
         }
 
-        if("registrationClient".equals(panelName) && currentPanel.equals("loginClient")) {
-            System.out.println("cambio pannello registrazione");
+        if ("registrationClient".equals(panelName) && currentPanel.equals("loginClient")) {
             mainView.changePanel(panelName);
         }
 
-        if("admin".equals(panelName)) {
+        if ("admin".equals(panelName)) {
             mainView.changePanel(panelName);
         }
-
-        System.out.println("panelName: " + panelName);
-        System.out.println("currentPanel: " + currentPanel);
     }
 
     public void changePanelInformazioniAggregate(final String panelName) {
-        if("MiglioriRider".equals(panelName)) {
+        if ("MiglioriRider".equals(panelName)) {
             controllerInformazioniAggregate.showMiglioriRider();
         }
 
-        if("RecensioniNegative".equals(panelName)) {
+        if ("RecensioniNegative".equals(panelName)) {
             controllerInformazioniAggregate.showRecensioniNegative();
         }
 
-        if("ClassificaProdottiPiuVenduti".equals(panelName)) {
+        if ("ClassificaProdottiPiuVenduti".equals(panelName)) {
             controllerInformazioniAggregate.showClassificaProdottiPiuVenduti();
         }
     }
-
 
     public void setClientLoggedIn(final Cliente cliente) {
         this.controllerClient.setUtenteLoggato(cliente);
@@ -109,9 +104,7 @@ public class MainController {
         this.controllerRider.setRiderLoggato(rider);
     }
 
-
-
-    public ControllerClientPanel getControllerClient(){
+    public ControllerClientPanel getControllerClient() {
         return this.controllerClient;
     }
 
@@ -138,6 +131,5 @@ public class MainController {
     public ControllerRegistrazione getControllerRegistrazione() {
         return this.controllerRegistrazione;
     }
-
 
 }

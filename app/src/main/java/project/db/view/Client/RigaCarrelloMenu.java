@@ -33,7 +33,6 @@ public class RigaCarrelloMenu extends RigaCarrello {
 
     public void mostraComponentiMenu(Map<Pair<String, Integer>, List<String>> componenti) {
         selezionaComponenteMenuPanel.caricaComponenti(componenti);
-        System.out.println("Componenti menu caricati: " + componenti + "********** SONO QUA");
         selezionaComponenteMenuPanel.setVisible(true);
     }
 
@@ -43,10 +42,6 @@ public class RigaCarrelloMenu extends RigaCarrello {
             ingredientiModificati.put(prodottoMenuSelezionato, new HashMap<>());
         }
         ingredientiModificati.get(prodottoMenuSelezionato).put(nomeIngrediente, new Pair<>("Aggiungi", quantita));
-        System.out.println(
-                "Ingrediente aggiunto: " + nomeIngrediente + ", quantità: " + quantita
-                        + ", prodotto menu selezionato: " + prodottoMenuSelezionato.getFirst() + ", numRowComp: "
-                        + prodottoMenuSelezionato.getSecond());
     }
 
     public void EliminaIngrediente(String nomeIngrediente, Integer quantita) {

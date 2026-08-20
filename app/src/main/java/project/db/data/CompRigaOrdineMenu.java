@@ -48,9 +48,6 @@ public class CompRigaOrdineMenu {
                 preparedStatement.setInt(3, numeroRiga);
                 preparedStatement.setString(4, codiceProdotto);
                 int rowsAffected = preparedStatement.executeUpdate();
-                System.out.println("Riga ordine menu inserita: " + codiceOrdine + ", " + codiceRiga + ", " + numeroRiga
-                        + ", " + codiceProdotto);
-                System.out.println("Rows affected: " + rowsAffected);
                 return rowsAffected > 0;
             } catch (SQLException e) {
                 throw new DAOException("Error inserting order line for menu", e);

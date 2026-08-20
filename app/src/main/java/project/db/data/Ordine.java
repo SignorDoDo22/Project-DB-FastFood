@@ -119,7 +119,6 @@ public class Ordine {
                     var codiceUtente = result.getString("Codice_Utente");
                     var codiceordine = result.getString("Codice_Ordine");
                     Ordine ordine = new Ordine(dataCreazione, indVia, indCittà, indCivico, codiceUtente, codiceordine);
-                    System.out.println("Ordine pronto: " + codiceordine + " per l'utente: " + codiceUtente);
 
                     ordiniPronti.add(ordine);
                 }
@@ -150,8 +149,7 @@ public class Ordine {
             } catch (Exception e) {
                 throw new DAOException("Errore nel caricamento degli ordini recensibili", e);
             }
-            System.out.println(
-                    "Numero di ordini recensibili per l'utente " + codiceUtente + ": " + ordiniRecensibili.size());
+
             return ordiniRecensibili;
         }
 
@@ -236,8 +234,6 @@ public class Ordine {
                 numero = Integer.parseInt(parteNumerica) + 1;
             }
 
-            System.out.println(
-                    "Prossimo codice generato: " + prefisso + String.format("%0" + lunghezzaNumero + "d", numero));
             return prefisso + String.format("%0" + lunghezzaNumero + "d", numero);
         }
 
@@ -263,6 +259,20 @@ public class Ordine {
             }
             return ordini;
 
+        }
+
+        public static String getRiderCodeByOrdine(Connection connection, String codiceOrdine) {
+            try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_RIDER_CODE_BY_ORDINE.get())) {
+                preparedStatement.setString(1, codiceOrdine);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("Codice_Rider");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DAOException("Errore nel recupero del codice del rider per l'ordine: " + codiceOrdine, e);
+            }
+            return null;
         }
 
     }

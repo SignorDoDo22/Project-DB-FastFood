@@ -19,7 +19,7 @@ public class MainView extends JFrame {
     private MainController mainController;
     private String currentPanel;
 
-    public MainView(final MainController mainController){
+    public MainView(final MainController mainController) {
 
         this.setTitle("Fast Food");
         this.setSize(800, 600);
@@ -30,7 +30,7 @@ public class MainView extends JFrame {
         this.sceltaPanel = new SceltaLogin(this);
         this.client = new ClientPanel(this);
         this.cardLayout = new CardLayout();
-        this.riderPanel = new RiderPanel( this);
+        this.riderPanel = new RiderPanel(this);
         this.adminPanel = new AdminPanel(this);
         this.setLayout(cardLayout);
         this.add(sceltaPanel, "scelta");
@@ -39,28 +39,26 @@ public class MainView extends JFrame {
         this.add(adminPanel, "admin");
     }
 
-    public void requestChangePanel(final String panelName, final String currentPanel){
-       this.mainController.changePanel(panelName, currentPanel);
+    public void requestChangePanel(final String panelName, final String currentPanel) {
+        this.mainController.changePanel(panelName, currentPanel);
     }
 
-     public void requestInformazioniAggregate(final String infoType) {
-        System.out.println("Requesting Informazioni Aggregate for type: " + infoType);
+    public void requestInformazioniAggregate(final String infoType) {
         this.mainController.changePanelInformazioniAggregate(infoType);
     }
 
-    public void changePanel(final String panelName){
+    public void changePanel(final String panelName) {
         this.cardLayout.show(this.getContentPane(), panelName);
         this.currentPanel = panelName;
     }
 
-    public ClientPanel getClientPanel(){
+    public ClientPanel getClientPanel() {
         return this.client;
     }
 
     public RegistrazionePanel getRegistrazionePanel() {
         return this.registrationPanel;
     }
-
 
     public RiderPanel getRiderPanel() {
         return this.riderPanel;
@@ -74,7 +72,7 @@ public class MainView extends JFrame {
         return this.currentPanel;
     }
 
-    public void addPanelToCardLayout(final JPanel panel, final String name){
+    public void addPanelToCardLayout(final JPanel panel, final String name) {
         this.add(panel, name);
     }
 
