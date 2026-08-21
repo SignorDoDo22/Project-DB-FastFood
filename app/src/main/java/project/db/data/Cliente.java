@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.List;
 import java.util.Map;
 import project.db.Queries;
 import project.db.controller.DAOException;
@@ -23,10 +22,9 @@ public class Cliente {
     private String cognome;
     private Date dataDiNascita;
     private String telefono;
-    private int NumOrdiniEffettuati;
 
     public Cliente(String codiceUtente, String username, String password, String email,
-                  String nome, String cognome, Date dataDiNascita, String telefono) {
+            String nome, String cognome, Date dataDiNascita, String telefono) {
         this.codiceUtente = codiceUtente;
         this.username = username;
         this.password = password;
@@ -35,28 +33,47 @@ public class Cliente {
         this.cognome = cognome;
         this.dataDiNascita = dataDiNascita;
         this.telefono = telefono;
-        this.NumOrdiniEffettuati = 0;
     }
 
-    public String getCodiceUtente() { return codiceUtente; }
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getEmail() { return email; }
-    public String getNome() { return nome; }
-    public String getCognome() { return cognome; }
-    public Date getDataDiNascita() { return dataDiNascita; }
-    public String getTelefono() { return telefono; }
-    public int getNumOrdiniEffettuati() { return NumOrdiniEffettuati; }
+    public String getCodiceUtente() {
+        return codiceUtente;
+    }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
+
+    public Date getDataDiNascita() {
+        return dataDiNascita;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
 
     public static class DAO {
 
         public static List<Cliente> list(final Connection connection) {
             List<Cliente> utenti = new ArrayList<>();
 
-            try (PreparedStatement preparedStatement =
-                         DAOUtils.prepare(connection, Queries.MOSTRA_CLIENTI.get());
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_CLIENTI.get());
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 while (resultSet.next()) {
                     utenti.add(mapUtente(resultSet));
@@ -78,10 +95,8 @@ public class Cliente {
                     resultSet.getString("Nome"),
                     resultSet.getString("Cognome"),
                     resultSet.getDate("Data_di_Nascita"),
-                    resultSet.getString("Telefono")
-            );
+                    resultSet.getString("Telefono"));
         }
-
 
         public static boolean insert(final Connection connection, Map<String, String> data) {
             try (PreparedStatement nuovoUtente = connection.prepareStatement(Queries.INSERIRE_CLIENTE.get())) {
@@ -105,28 +120,27 @@ public class Cliente {
 
         public static Cliente getCliente(final Connection connection, final String password, final String email) {
 
-            try(
-                PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_CLIENTE_PER_Email.get(), password, email);
+            try (
+                    PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                            Queries.CERCA_CLIENTE_PER_Email.get(), password, email);
 
-                ResultSet resultSet = preparedStatement.executeQuery();
-            ){
-               if (resultSet.next()) {
-                   return mapUtente(resultSet);
-               } else {
-                   return null;
-               }
+                    ResultSet resultSet = preparedStatement.executeQuery();) {
+                if (resultSet.next()) {
+                    return mapUtente(resultSet);
+                } else {
+                    return null;
+                }
 
-            }catch(final Exception e ){
+            } catch (final Exception e) {
                 throw new DAOException("Errore durante il recupero del cliente", e);
             }
         }
 
-
         public static boolean find(final Connection connection, final String email, final String password) {
             try (
-                var statement = DAOUtils.prepare(connection, Queries.CERCA_CLIENTE_PER_Email.get(), email, password);
-                var resultSet = statement.executeQuery();
-            ) {
+                    var statement = DAOUtils.prepare(connection, Queries.CERCA_CLIENTE_PER_Email.get(), email,
+                            password);
+                    var resultSet = statement.executeQuery();) {
                 if (resultSet.next()) {
                     return true;
                 }
@@ -137,7 +151,6 @@ public class Cliente {
                 throw new DAOException(e);
             }
         }
-
 
         public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
             String ultimoCodice = getNextCodiceCliente(connection);
@@ -156,8 +169,9 @@ public class Cliente {
 
         public static String getNextCodiceCliente(Connection connection) {
             String nextCodiceRider = null;
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ULTIMO_CLIENTE_CODICE.get());
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.MOSTRA_ULTIMO_CLIENTE_CODICE.get());
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
                     nextCodiceRider = resultSet.getString(1);
@@ -168,9 +182,10 @@ public class Cliente {
             return nextCodiceRider;
         }
 
-         public static boolean checkEmailExists(Connection connection, String email) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_CLIENT_EMAIL.get(), email);
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+        public static boolean checkEmailExists(Connection connection, String email) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_CLIENT_EMAIL.get(),
+                    email);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 return resultSet.next();
 

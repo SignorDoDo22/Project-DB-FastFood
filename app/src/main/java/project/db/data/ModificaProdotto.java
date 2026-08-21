@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import project.db.Queries;
 import project.db.controller.DAOUtils;
 
@@ -91,7 +89,6 @@ public class ModificaProdotto {
                     var resultSet = statement.executeQuery();) {
 
                 if (!resultSet.next()) {
-                    // nessuna riga trovata: l'ingrediente non è associato a quel prodotto
                     return false;
                 }
 

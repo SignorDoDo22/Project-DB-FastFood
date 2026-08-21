@@ -1,4 +1,5 @@
 package project.db.data;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,8 +24,8 @@ public class Rider {
     private int raitingMedio;
     private float guadagnoTotale;
 
-
-    public Rider(Date dataDiNascita, String codiceRider, String nome, String cognome, String email, String password, String telefono) {
+    public Rider(Date dataDiNascita, String codiceRider, String nome, String cognome, String email, String password,
+            String telefono) {
         this.dataDiNascita = dataDiNascita;
         this.codiceRider = codiceRider;
         this.nome = nome;
@@ -47,12 +48,21 @@ public class Rider {
     public String getCognome() {
         return cognome;
     }
+
     public String getEmail() {
         return email;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public Date getDataDiNascita() {
+        return dataDiNascita;
     }
 
     public void setRatingMedio(int raitingMedio) {
@@ -71,14 +81,13 @@ public class Rider {
         return guadagnoTotale;
     }
 
-
     public static class DAO {
 
         public static List<Rider> list(final Connection connection) {
             List<Rider> riders = new ArrayList<>();
 
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_RIDER.get());
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 while (resultSet.next()) {
                     String codiceRider = resultSet.getString("Codice_Rider");
@@ -102,10 +111,10 @@ public class Rider {
             return riders;
         }
 
-
         public static boolean find(final Connection connection, final String email, final String password) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER.get(), email, password);
-                ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER.get(), email,
+                    password);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
                     return true;
@@ -119,9 +128,10 @@ public class Rider {
         }
 
         public static Rider getRider(final Connection connection, final String email, final String password) {
-          try(PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER.get(), email, password);
-              ResultSet resultSet = preparedStatement.executeQuery()) {
-              if (resultSet.next()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER.get(), email,
+                    password);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
                     var codiceRider = resultSet.getString("Codice_Rider");
                     var nome = resultSet.getString("nome");
                     var cognome = resultSet.getString("cognome");
@@ -131,15 +141,14 @@ public class Rider {
                     rider.setRatingMedio(resultSet.getInt("RaitingMedioRider"));
                     rider.setGuadagnoTotale(resultSet.getFloat("Guadagno"));
                     return rider;
-              }
-              return null;
+                }
+                return null;
 
-          } catch (SQLException e) {
-              e.printStackTrace();
-              return null;
-          }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
-
 
         public static boolean insert(Map<String, String> data, Connection connection) {
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_RIDER.get())) {
@@ -152,8 +161,8 @@ public class Rider {
                 preparedStatement.setString(6, data.get("cognome"));
                 preparedStatement.setDate(7, java.sql.Date.valueOf(data.get("dataDiNascita")));
                 preparedStatement.setString(8, data.get("telefono"));
-                preparedStatement.setInt(9, 0); // RaitingMedioRider
-                preparedStatement.setFloat(10, 0); // Guadagno
+                preparedStatement.setInt(9, 0);
+                preparedStatement.setFloat(10, 0);
                 int rowsAffected = preparedStatement.executeUpdate();
                 return rowsAffected > 0;
             } catch (SQLException e) {
@@ -182,8 +191,9 @@ public class Rider {
 
         public static String getNextCodiceRider(Connection connection) {
             String nextCodiceRider = null;
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.MOSTRA_ULTIMO_RIDER_CODICE.get());
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.MOSTRA_ULTIMO_RIDER_CODICE.get());
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
                     nextCodiceRider = resultSet.getString(1);
@@ -194,10 +204,9 @@ public class Rider {
             return nextCodiceRider;
         }
 
-
-
         public static void aggiornaRaitingMedio(String codice_rider, int raiting, Connection connection) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_MEDIA_RIDER.get())) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.AGGIORNA_MEDIA_RIDER.get())) {
                 preparedStatement.setString(1, codice_rider);
                 preparedStatement.setString(2, codice_rider);
                 preparedStatement.executeUpdate();
@@ -207,7 +216,8 @@ public class Rider {
         }
 
         public static void aggiornaGuadagno(float guadagno, Connection connection, String codiceRider) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.AGGIORNA_GUADAGNO_TOTALE_RIDER.get())) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.AGGIORNA_GUADAGNO_TOTALE_RIDER.get())) {
                 preparedStatement.setFloat(1, guadagno);
                 preparedStatement.setString(2, codiceRider);
                 preparedStatement.executeUpdate();
@@ -217,7 +227,8 @@ public class Rider {
         }
 
         public static void riderPrendeInCaricoOrdine(String codiceRider, String codiceOrdine, Connection connection) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_DENTRO_ORDINE_RIDER.get())) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection,
+                    Queries.INSERIRE_DENTRO_ORDINE_RIDER.get())) {
                 preparedStatement.setString(1, codiceRider);
                 preparedStatement.setString(2, codiceOrdine);
                 preparedStatement.executeUpdate();
@@ -226,7 +237,7 @@ public class Rider {
             }
         }
 
-        public static String getLast(Connection connection){
+        public static String getLast(Connection connection) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.GET_LAST_RIDER_CODICE.get())) {
                 try (var resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -240,8 +251,9 @@ public class Rider {
         }
 
         public static boolean checkEmailExists(Connection connection, String email) {
-            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER_EMAIL.get(), email);
-                 ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.CERCA_RIDER_EMAIL.get(),
+                    email);
+                    ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 return resultSet.next();
 

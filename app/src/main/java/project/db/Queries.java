@@ -67,41 +67,7 @@ public enum Queries {
                         SELECT Codice_Ingrediente FROM Ingrediente WHERE Nome_Ingrediente = ?
                         """),
 
-        // =================================================
-        // SCONTO (+ sottotipi)
-        // =================================================
-
-        INSERIRE_SCONTO("""
-                        INSERT INTO Sconto (Codice_Sconto, Data_Inizio, Data_Fine, Percentuale_Scontata, Descrizione, ScontoOffertoDallaCasa)
-                        VALUES(?,?,?,?,?,?)
-                        """),
-
-        INSERIRE_SCONTO_FEDELTA_PADRE(
-                        """
-                                        INSERT INTO Sconto (Codice_Sconto, Data_Inizio, Data_Fine, Percentuale_Scontata, Descrizione, ScontoFedelta)
-                                        VALUES(?,?,?,?,?,?)
-                                        """),
-
-        INSERIRE_SCONTOCASA("""
-                        INSERT INTO ScontoOffertoDallaCasa (Codice_Sconto) VALUES (?)
-                        """),
-
-        INSERIRE_SCONTOFEDEL("""
-                        INSERT INTO ScontoFedelta (Codice_Sconto, QuotaOrdini, NumeroUtilizzi)
-                        VALUES(?, ?, ?)
-                        """),
-
-        MOSTRA_SCONTI("""
-                        SELECT s.*,
-                                CASE WHEN s.ScontoFedelta IS NOT NULL THEN 'Fedelta'
-                                WHEN s.ScontoOffertoDallaCasa IS NOT NULL THEN 'Casa'
-                                ELSE 'Sconosciuto' END AS Tipo
-                        FROM Sconto s
-                        """),
-
-        // =================================================
         // CLIENTE / RIDER
-        // =================================================
 
         INSERIRE_CLIENTE("""
                         INSERT INTO Cliente (Codice_Utente, Username, Password, Email, Nome,
@@ -192,7 +158,7 @@ public enum Queries {
                         """),
 
         // =================================================
-        // PRODOTTO (+ Singolo/Menu)
+        // PRODOTTO / MENU / SINGOLO
         // =================================================
 
         PRODOTTI_MIGLIORI_CLASSIFICA("""
@@ -365,7 +331,7 @@ public enum Queries {
                         """),
 
         // =================================================
-        // ORDINE
+        // ORDINE E STATO_ORDINE
         // =================================================
 
         INSERIRE_STATO_ORDINE("""
@@ -399,13 +365,6 @@ public enum Queries {
                         SELECT o.* FROM Ordine o
                         WHERE NOT EXISTS (SELECT 1 FROM Prende_in_carico p WHERE p.Codice_Ordine = o.Codice_Ordine)
                         ORDER BY o.DataCreazione
-                        """),
-
-        MOSTRA_ORDINI_ASSEGNATI_RIDER("""
-                        SELECT o.* FROM Ordine o
-                        JOIN Prende_in_carico p ON p.Codice_Ordine = o.Codice_Ordine
-                        WHERE p.Codice_Utente = ?
-                        ORDER BY o.DataCreazione DESC
                         """),
 
         MOSTRA_ULTIMO_ORDINE_CODICE("""
@@ -451,11 +410,6 @@ public enum Queries {
         // =================================================
         // RIGA_PRODOTTO (+ sottotipi)
         // =================================================
-
-        INSERIRE_RIGA_PRODOTTO_SINGOLA("""
-                        INSERT INTO Riga_prodotto (Codice_Ordine, CodiceRiga, Quantita, Prezzo, RigaProdottoSingolo)
-                        VALUES (?, ?, ?, ?, ?, ?)
-                        """),
 
         INSERIRE_RIGAPRODOTTOSINGOLO("""
                         INSERT INTO RigaProdottoSingolo (Codice_Ordine, CodiceRiga, Codice_Prodotto)

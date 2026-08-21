@@ -13,6 +13,7 @@ import java.util.List;
 
 public class ControllerRider {
 
+    private float guadagnoQuota = 350;
     private MainController mainController;
     private ReadingModel modelReading;
     private RiderPanel riderPanel;
@@ -84,7 +85,7 @@ public class ControllerRider {
             this.riderPanel.showErrorMessage("Errore durante la consegna dell'ordine.");
         }
 
-        writingModel.aggiornaGuadagnoRider(500, riderLoggato.getCodiceRider());
+        writingModel.aggiornaGuadagnoRider(guadagnoQuota, riderLoggato.getCodiceRider());
         showOrders();
         this.riderPanel.enableRefreshButton();
         ordinePresoInCarico = null;
