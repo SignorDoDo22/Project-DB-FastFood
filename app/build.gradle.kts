@@ -6,8 +6,9 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
+    java
     application
+    id("com.gradleup.shadow") version "9.0.0"
 }
 
 repositories {
@@ -35,6 +36,11 @@ java {
 application {
     // Define the main class for the application.
     mainClass = "project.db.App"
+}
+
+tasks.shadowJar {
+    destinationDirectory.set(rootProject.layout.projectDirectory)
+    archiveFileName.set("FastFood.jar")
 }
 
 tasks.named<Test>("test") {
