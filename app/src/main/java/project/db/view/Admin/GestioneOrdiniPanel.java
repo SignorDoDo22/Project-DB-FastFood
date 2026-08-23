@@ -47,6 +47,7 @@ public class GestioneOrdiniPanel extends JDialog {
             this.panelInterno.add(ordine);
         }
         this.panelInterno.revalidate();
+        this.panelInterno.repaint();
     }
 
 }

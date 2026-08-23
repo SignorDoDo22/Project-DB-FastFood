@@ -42,7 +42,7 @@ public class OrdineAdminPanel extends JPanel {
         this.add(azionePanel, BorderLayout.EAST);
 
         button.addActionListener(e -> {
-            controller.changeOrdineStatusReady(this.codiceOrdine);
+            this.controller.changeOrdineStatusReady(this.codiceOrdine);
         });
     }
 

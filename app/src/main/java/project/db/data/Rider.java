@@ -153,7 +153,7 @@ public class Rider {
         public static boolean insert(Map<String, String> data, Connection connection) {
             try (PreparedStatement preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_RIDER.get())) {
 
-                preparedStatement.setString(1, getProssimoCodice(connection, "RD", 5));
+                preparedStatement.setString(1, getProssimoCodice(connection, "RID", 3));
                 preparedStatement.setString(2, data.get("username"));
                 preparedStatement.setString(3, data.get("password"));
                 preparedStatement.setString(4, data.get("email"));

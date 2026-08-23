@@ -13,14 +13,6 @@ import java.awt.Insets;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Dialog usato SOLO per le righe del carrello di tipo menu: mostra i prodotti
- * che compongono il menu e permette di scegliere quale modificare. Dopo la
- * selezione, delega a RigaCarrello l'apertura del pannello di modifica
- * ingredienti per il componente scelto. Resta aperto dopo la selezione, così
- * l'utente può modificare più componenti dello stesso menu senza dover
- * riaprire il dialog da capo.
- */
 public class Selezionacomponentemenupanel extends JDialog {
 
     private final JComboBox<String> componentiComboBox = new JComboBox<>();
@@ -62,9 +54,9 @@ public class Selezionacomponentemenupanel extends JDialog {
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            rigaCarrello.setProdottoMenuSelezionato(
+            this.rigaCarrello.setProdottoMenuSelezionato(
                     new Pair<String, Integer>(componenteSelezionato, componentiComboBox.getSelectedIndex()));
-            rigaCarrello.requestIngredienti();
+            this.rigaCarrello.requestIngredienti();
 
         });
 

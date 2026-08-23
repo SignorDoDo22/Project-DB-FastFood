@@ -117,6 +117,16 @@ public class ControllerClientPanel {
 
     public void userRequestCreateRecensione(String codiceOrdine, int votoRider, int votoOrdine,
             String testoRecensione) {
+
+        if (testoRecensione == null || testoRecensione.isBlank()) {
+            testoRecensione = "Nessuna recensione fornita.";
+        }
+
+        if (testoRecensione.length() > 200) {
+            this.clientPanel.showErrorMessage("La recensione non può superare i 200 caratteri.");
+            return;
+        }
+
         this.modelWriting.inserisciRecensione(codiceOrdine, testoRecensione, votoOrdine, votoRider);
         this.modelWriting.aggiornaRaitingRider(votoRider, this.modelReading.getRiderCodeByOrdine(codiceOrdine));
     }
@@ -212,6 +222,9 @@ public class ControllerClientPanel {
 
             conn.commit();
             carrello.svuotaCarrello();
+            clientPanel.showInfoMessage("Ordine completato con successo.");
+            this.domicilioPanel.setVisible(false);
+            this.domicilioPanel.resetCampiDomicilio();
             return true;
 
         } catch (final DAOException | SQLException e) {

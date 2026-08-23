@@ -1,10 +1,8 @@
 package project.db.view.Admin;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
@@ -21,30 +19,25 @@ public class CreaCategoria extends JDialog {
 
     public CreaCategoria(final ControllerAdmin controller) {
         this.controller = controller;
-        this.setSize(700,700);
+        this.setSize(700, 700);
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         this.nomeCategoriaLabel = new JLabel("Nome Categoria:");
         this.add(nomeCategoriaLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         this.nomeCategoriaField = new JFormattedTextField();
         this.nomeCategoriaField.setColumns(20);
         this.add(nomeCategoriaField, gbc);
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         this.creaCategoriaButton = new JButton("Crea Categoria");
         this.add(creaCategoriaButton, gbc);
-
-        this.creaCategoriaButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controller.createCategoria(nomeCategoriaField.getText());
-            }
-
-        });
+        this.creaCategoriaButton.addActionListener(e -> this.controller.createCategoria(nomeCategoriaField.getText()));
 
     }
 
@@ -53,7 +46,8 @@ public class CreaCategoria extends JDialog {
     }
 
     public void showSuccessMessage(String message) {
-        javax.swing.JOptionPane.showMessageDialog(this, message, "Successo", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        javax.swing.JOptionPane.showMessageDialog(this, message, "Successo",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
         this.setVisible(false);
     }
 }

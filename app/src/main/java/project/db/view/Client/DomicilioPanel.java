@@ -88,4 +88,10 @@ public class DomicilioPanel extends JDialog {
         }
         return datiDomicilio;
     }
+
+    public void resetCampiDomicilio() {
+        for (TextField field : campiDomicilio.values()) {
+            field.setText("");
+        }
+    }
 }

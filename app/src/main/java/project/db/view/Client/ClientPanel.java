@@ -66,14 +66,9 @@ public class ClientPanel extends JPanel {
         this.pannelloInferiore.add(buttonProcedi);
         this.add(pannelloInferiore, BorderLayout.SOUTH);
 
-        this.buttonIndietro.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controllerClientPanel.logout();
-                mainView.requestChangePanel("scelta", "client");
-
-            }
+        this.buttonIndietro.addActionListener(e -> {
+            controllerClientPanel.logout();
+            this.mainView.requestChangePanel("scelta", "client");
         });
 
         this.buttonProcedi.addActionListener(new ActionListener() {
@@ -162,6 +157,14 @@ public class ClientPanel extends JPanel {
 
     public void createRecensioni(String numOrdine, int votoRider, int votoOrdine, String testoRecensione) {
         controllerClientPanel.userRequestCreateRecensione(numOrdine, votoRider, votoOrdine, testoRecensione);
+    }
+
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Errore", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showInfoMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Informazione", JOptionPane.INFORMATION_MESSAGE);
     }
 
 }

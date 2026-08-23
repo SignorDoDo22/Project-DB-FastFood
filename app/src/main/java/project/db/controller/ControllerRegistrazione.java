@@ -16,15 +16,13 @@ public class ControllerRegistrazione {
     private RegistrazioneClientPanel registrationPanel;
     private RegistrazioneRiderPanel registrationPanelRider;
 
-
-    public ControllerRegistrazione( MainController mainController, ReadingModel model, WritingModel modelWriting) {
+    public ControllerRegistrazione(MainController mainController, ReadingModel model, WritingModel modelWriting) {
         this.mainController = mainController;
         this.modelReading = model;
         this.modelWriting = modelWriting;
         this.registrationPanel = new RegistrazioneClientPanel(this, mainController);
         this.registrationPanelRider = new RegistrazioneRiderPanel(this, mainController);
     }
-
 
     public void tryRegistration() {
 
@@ -41,15 +39,16 @@ public class ControllerRegistrazione {
         var dataDiNascita = java.sql.Date.valueOf(data.get("dataDiNascita"));
         var telefono = data.get("telefono");
 
-        if(username.isEmpty() || password.isEmpty() || email.isEmpty() || nome.isEmpty() || cognome.isEmpty() || telefono.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty() || nome.isEmpty() || cognome.isEmpty()
+                || telefono.isEmpty()) {
             registrationPanel.showErrorMessage("Compila tutti i campi");
         }
 
-        if(modelReading.getCliente(email, password) != null) {
+        if (modelReading.getCliente(email, password) != null) {
             registrationPanel.showErrorMessage("Utente già esistente");
         }
 
-        if(modelWriting.userRequestRegistration(mainController.getConnection(), data)) {
+        if (modelWriting.userRequestRegistration(mainController.getConnection(), data)) {
             registrationPanel.showSuccessMessage("Registrazione completata con successo");
             mainController.getMainView().requestChangePanel("login", "registration");
         }
@@ -70,21 +69,22 @@ public class ControllerRegistrazione {
         var dataDiNascita = java.sql.Date.valueOf(data.get("dataDiNascita"));
         var telefono = data.get("telefono");
 
-        if(username.isEmpty() || password.isEmpty() || email.isEmpty() || nome.isEmpty() || cognome.isEmpty() || telefono.isEmpty() || dataDiNascita == null) {
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty() || nome.isEmpty() || cognome.isEmpty()
+                || telefono.isEmpty() || dataDiNascita == null) {
             registrationPanelRider.showErrorMessage("Compila tutti i campi");
             return;
         }
 
-        if(modelReading.checkEmailRiderExists(email)) {
+        if (modelReading.checkEmailRiderExists(email)) {
             registrationPanelRider.showErrorMessage("Utente già esistente");
             return;
         }
 
-        if(modelReading.getRider(email, password) != null) {
+        if (modelReading.getRider(email, password) != null) {
             registrationPanelRider.showErrorMessage("Utente già esistente");
         }
 
-        if(modelWriting.inserisciRider(data)) {
+        if (modelWriting.inserisciRider(data)) {
             registrationPanelRider.showSuccessMessage("Registrazione completata con successo");
             mainController.getMainView().requestChangePanel("login", "registrationRider");
         }

@@ -99,7 +99,7 @@ public class ReadingModel {
     }
 
     public String getNextProdottoCode() {
-        return Prodotto.DAO.getProssimoCodice(connection, "PR", 3);
+        return Prodotto.DAO.getProssimoCodice(connection, "PRD", 2);
     }
 
     public String getNextOrdineCode() {

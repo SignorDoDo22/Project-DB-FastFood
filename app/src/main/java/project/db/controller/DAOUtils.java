@@ -20,7 +20,7 @@ public class DAOUtils {
 
     public static PreparedStatement prepare(Connection conn, String query, Object... params) throws SQLException {
         PreparedStatement statement = null;
-        try{
+        try {
             statement = conn.prepareStatement(query);
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);

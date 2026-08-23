@@ -253,13 +253,13 @@ public class Prodotto {
 
         public static String getProssimoCodice(Connection connection, String prefisso, int lunghezzaNumero) {
             String ultimoCodice = getLast(connection);
-
             int numero;
             if (ultimoCodice == null || ultimoCodice.isBlank()) {
                 numero = 1;
             } else {
                 String codiceTrim = ultimoCodice.trim();
                 String parteNumerica = codiceTrim.substring(prefisso.length());
+                System.out.println("Parte numerica: " + parteNumerica);
                 numero = Integer.parseInt(parteNumerica) + 1;
             }
 

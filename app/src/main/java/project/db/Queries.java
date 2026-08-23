@@ -361,12 +361,6 @@ public enum Queries {
                         ORDER BY DataCreazione DESC
                         """),
 
-        MOSTRA_ORDINI_DISPONIBILI("""
-                        SELECT o.* FROM Ordine o
-                        WHERE NOT EXISTS (SELECT 1 FROM Prende_in_carico p WHERE p.Codice_Ordine = o.Codice_Ordine)
-                        ORDER BY o.DataCreazione
-                        """),
-
         MOSTRA_ULTIMO_ORDINE_CODICE("""
                         SELECT Codice_Ordine FROM Ordine ORDER BY Codice_Ordine DESC LIMIT 1
                         """),

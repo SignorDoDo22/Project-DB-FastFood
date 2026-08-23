@@ -41,7 +41,13 @@ public class Carrello extends JPanel {
     public void addRigaCarrello(String codiceProdotto, int quantita, String nomeProdotto, float prezzoUnitario,
             boolean menu) {
 
+        if (righeCarrello.size() >= 10) {
+            this.clientPanel.showErrorMessage("Non puoi aggiungere più di 10 prodotti al carrello.");
+            return;
+        }
+
         String codiceRiga = controllerClientPanel.generaProssimoCodiceRiga();
+
         if (menu) {
             RigaCarrelloMenu rigaOrdine = new RigaCarrelloMenu(menu, prezzoUnitario, quantita, nomeProdotto,
                     codiceProdotto, this,

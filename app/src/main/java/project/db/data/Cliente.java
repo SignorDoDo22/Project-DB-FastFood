@@ -100,7 +100,7 @@ public class Cliente {
 
         public static boolean insert(final Connection connection, Map<String, String> data) {
             try (PreparedStatement nuovoUtente = connection.prepareStatement(Queries.INSERIRE_CLIENTE.get())) {
-                nuovoUtente.setString(1, getProssimoCodice(connection, "CU", 4));
+                nuovoUtente.setString(1, getProssimoCodice(connection, "CLI", 3));
                 nuovoUtente.setString(2, data.get("username"));
                 nuovoUtente.setString(3, data.get("password"));
                 nuovoUtente.setString(4, data.get("email"));

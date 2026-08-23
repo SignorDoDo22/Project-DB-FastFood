@@ -33,20 +33,17 @@ public class CardRecensione extends JPanel {
     private final ClientPanel clientPanel;
     private final RecensioniPanel recensioniPanel;
 
-    public CardRecensione(final String numOrdine, final ClientPanel clientPanel, final RecensioniPanel recensioniPanel) {
+    public CardRecensione(final String numOrdine, final ClientPanel clientPanel,
+            final RecensioniPanel recensioniPanel) {
         this.recensioniPanel = recensioniPanel;
         this.numOrdine = numOrdine;
         this.clientPanel = clientPanel;
-
-        // Stesso border "a riga" di ProdottoCard
         this.setBorder(BorderFactory.createCompoundBorder(
                 new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
-                new EmptyBorder(10, 15, 10, 15)
-        ));
+                new EmptyBorder(10, 15, 10, 15)));
         this.setLayout(new BorderLayout());
         this.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-        // ---- Pannello sinistro: info ordine ----
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
@@ -58,11 +55,10 @@ public class CardRecensione extends JPanel {
 
         this.add(infoPanel, BorderLayout.WEST);
 
-        // ---- Pannello destro: bottone che apre il dialog ----
         JPanel azionePanel = new JPanel();
         azionePanel.setLayout(new BoxLayout(azionePanel, BoxLayout.Y_AXIS));
 
-        Integer[] voti = {1, 2, 3, 4, 5};
+        Integer[] voti = { 1, 2, 3, 4, 5 };
         this.votoOrdineSelector = new JComboBox<>(voti);
         this.votoRiderSelector = new JComboBox<>(voti);
 
@@ -74,7 +70,6 @@ public class CardRecensione extends JPanel {
         votoRiderPanel.add(new JLabel("Voto Rider:"));
         votoRiderPanel.add(votoRiderSelector);
 
-        // FIX: testoRecensione va inizializzato prima di usarlo
         this.testoRecensione = new JTextArea(5, 20);
 
         this.creaRecensione = new JButton("Crea Recensione");
@@ -82,7 +77,6 @@ public class CardRecensione extends JPanel {
 
         this.add(azionePanel, BorderLayout.EAST);
 
-        // ---- Costruzione del dialog ----
         this.dialogRecensione = new JDialog();
         this.dialogRecensione.setTitle("Crea Recensione");
         this.dialogRecensione.setLayout(new BorderLayout());
@@ -100,14 +94,14 @@ public class CardRecensione extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                clientPanel.createRecensioni(numOrdine, (int) votoRiderSelector.getSelectedItem(), (int) votoOrdineSelector.getSelectedItem(), testoRecensione.getText());
+                clientPanel.createRecensioni(numOrdine, (int) votoRiderSelector.getSelectedItem(),
+                        (int) votoOrdineSelector.getSelectedItem(), testoRecensione.getText());
 
                 recensioniPanel.refresh();
                 dialogRecensione.setVisible(false);
             }
 
         });
-
 
         this.creaRecensione.addActionListener(new ActionListener() {
             @Override
@@ -117,7 +111,6 @@ public class CardRecensione extends JPanel {
         });
     }
 
-    // Getter puliti: la view espone solo dati grezzi, non componenti
     public String getTestoRecensione() {
         return testoRecensione.getText();
     }

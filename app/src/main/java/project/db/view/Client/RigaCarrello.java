@@ -25,9 +25,6 @@ public class RigaCarrello extends JPanel {
     protected boolean menu;
     protected String codiceRiga;
     protected ControllerClientPanel controllerClientPanel;
-
-    // Accesso protected (non più private) perché EliminaIngrediente,
-    // ora spostato in RigaCarrelloMenu, deve poterlo usare.
     protected ModificaIngredientiPanel modificaIngredientiPanel;
 
     public RigaCarrello(boolean menu, float prezzo, int quantita, String nomeProdotto, String codiceProdotto,
@@ -45,7 +42,7 @@ public class RigaCarrello extends JPanel {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.nomeProdottoLabel = new JLabel(nomeProdotto);
         this.quantitaLabel = new JLabel(String.valueOf(quantita));
-        this.prezzoLabel = new JLabel(String.format(" € %.3f", prezzo));
+        this.prezzoLabel = new JLabel(String.format(" € %.3f  ", prezzo));
 
         this.add(nomeProdottoLabel);
         this.add(quantitaLabel);

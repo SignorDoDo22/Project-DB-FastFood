@@ -30,6 +30,7 @@ public class ProdottoMenu extends Prodotto {
 
         public static boolean insert(final Connection connection, String codice) {
             try (var preparedStatement = DAOUtils.prepare(connection, Queries.INSERIRE_MENU.get())) {
+                preparedStatement.setString(1, codice);
                 int rowsAffected = preparedStatement.executeUpdate();
                 return rowsAffected > 0;
             } catch (SQLException e) {

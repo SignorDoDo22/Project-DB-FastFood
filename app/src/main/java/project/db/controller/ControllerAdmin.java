@@ -63,7 +63,6 @@ public class ControllerAdmin {
 
     public void changeOrdineStatusReady(String codiceOrdine) {
         if (requestChangeOrdineStatusReady(codiceOrdine)) {
-            this.adminPanel.mostraMessaggio("Ordine " + codiceOrdine + " segnato come pronto.");
             requestOrdiniInPreparazione();
         }
     }
