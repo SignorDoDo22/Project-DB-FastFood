@@ -45,8 +45,6 @@ public class ModificaIngredientiPanel extends JDialog {
         c.gridwidth = 3;
         this.add(titoloLabel, c);
         c.gridwidth = 1;
-
-        // Sezione: aggiungi ingrediente non presente
         c.gridx = 0;
         c.gridy = 4;
         this.add(new JLabel("Aggiungi/Elimina ingrediente:"), c);

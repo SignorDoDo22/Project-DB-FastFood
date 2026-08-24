@@ -21,6 +21,11 @@ public class RigaCarrelloSingolo extends RigaCarrello {
 
     public void InserisciIngredienteProdSingolo(String nomeIngrediente, Integer quantita) {
 
+        if (ingredientiModificatiProdSingolo.size() >= 4) {
+            modificaIngredientiPanel.showErrorMessage("Non puoi aggiungere più di 4 ingredienti al prodotto singolo.");
+            return;
+        }
+
         if (!ingredientiModificatiProdSingolo.containsKey(nomeIngrediente)) {
             ingredientiModificatiProdSingolo.put(nomeIngrediente, new Pair<>("Aggiungi", quantita));
         } else {

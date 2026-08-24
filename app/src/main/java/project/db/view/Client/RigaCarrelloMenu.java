@@ -40,6 +40,11 @@ public class RigaCarrelloMenu extends RigaCarrello {
 
         if (!ingredientiModificati.containsKey(prodottoMenuSelezionato)) {
             ingredientiModificati.put(prodottoMenuSelezionato, new HashMap<>());
+        } else {
+            if (ingredientiModificati.get(prodottoMenuSelezionato).size() >= 4) {
+                modificaIngredientiPanel.showErrorMessage("Non puoi aggiungere più di 4 ingredienti al menu.");
+                return;
+            }
         }
         ingredientiModificati.get(prodottoMenuSelezionato).put(nomeIngrediente, new Pair<>("Aggiungi", quantita));
     }
@@ -56,6 +61,11 @@ public class RigaCarrelloMenu extends RigaCarrello {
 
         if (!ingredientiModificati.containsKey(prodottoMenuSelezionato)) {
             ingredientiModificati.put(prodottoMenuSelezionato, new HashMap<>());
+        } else {
+            if (ingredientiModificati.get(prodottoMenuSelezionato).size() >= 4) {
+                modificaIngredientiPanel.showErrorMessage("Non puoi aggiungere più di 4 ingredienti al menu.");
+                return;
+            }
         }
         ingredientiModificati.get(prodottoMenuSelezionato).put(nomeIngrediente, new Pair<>("Elimina", quantita));
     }

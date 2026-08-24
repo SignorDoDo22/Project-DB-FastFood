@@ -21,7 +21,6 @@ public class RegistrazionePanel extends JPanel {
     protected MainController maincontroller;
     protected JButton registratiButton;
     protected JButton indietroButton;
-    private JTextField codiceUtenteField;
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JTextField emailField;
@@ -31,7 +30,6 @@ public class RegistrazionePanel extends JPanel {
     private JTextField telefonoField;
     private Map<String, JTextField> userData;
 
-
     public RegistrazionePanel(ControllerRegistrazione controller, MainController maincontroller) {
         this.controller = controller;
         this.maincontroller = maincontroller;
@@ -40,56 +38,72 @@ public class RegistrazionePanel extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.NONE;
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         this.add(new JLabel("Username:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 1;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         this.usernameField = new JTextField(15);
         this.add(usernameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         this.add(new JLabel("Password:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 2;
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         this.passwordField = new JPasswordField(15);
         this.add(passwordField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         this.add(new JLabel("Email:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 3;
+        gbc.gridx = 1;
+        gbc.gridy = 3;
         this.emailField = new JTextField(15);
         this.add(emailField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
         this.add(new JLabel("Nome:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 4;
+        gbc.gridx = 1;
+        gbc.gridy = 4;
         this.nomeField = new JTextField(15);
         this.add(nomeField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0;
+        gbc.gridy = 5;
         this.add(new JLabel("Cognome:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 5;
+        gbc.gridx = 1;
+        gbc.gridy = 5;
         this.cognomeField = new JTextField(15);
         this.add(cognomeField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0;
+        gbc.gridy = 6;
         this.add(new JLabel("Data di Nascita (AAAA-MM-GG):"), gbc);
-        gbc.gridx = 1; gbc.gridy = 6;
+        gbc.gridx = 1;
+        gbc.gridy = 6;
         var dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
         this.dataDiNascitaField = new JFormattedTextField(new DateFormatter(dateFormat));
         this.dataDiNascitaField.setColumns(15);
         this.add(dataDiNascitaField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 7;
+        gbc.gridx = 0;
+        gbc.gridy = 7;
         this.add(new JLabel("Telefono:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 7;
+        gbc.gridx = 1;
+        gbc.gridy = 7;
         this.telefonoField = new JTextField(15);
         this.add(telefonoField, gbc);
 
         this.registratiButton = new JButton("Registrati");
         this.indietroButton = new JButton("Indietro");
-        gbc.gridx = 0; gbc.gridy = 8;
+        gbc.gridx = 0;
+        gbc.gridy = 8;
         this.add(registratiButton, gbc);
-        gbc.gridx = 0; gbc.gridy = 9;
+        gbc.gridx = 0;
+        gbc.gridy = 9;
         this.add(indietroButton, gbc);
 
         this.userData = Map.of(
@@ -99,8 +113,7 @@ public class RegistrazionePanel extends JPanel {
                 "nome", nomeField,
                 "cognome", cognomeField,
                 "dataDiNascita", dataDiNascitaField,
-                "telefono", telefonoField
-        );
+                "telefono", telefonoField);
 
     }
 

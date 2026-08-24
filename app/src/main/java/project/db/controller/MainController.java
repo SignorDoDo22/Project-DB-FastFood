@@ -132,4 +132,16 @@ public class MainController {
         return this.controllerRegistrazione;
     }
 
+    public ControllerAdmin getControllerAdmin() {
+        return this.controllerAdmin;
+    }
+
+    public ControllerInformazioniAggregate getControllerInformazioniAggregate() {
+        return this.controllerInformazioniAggregate;
+    }
+
+    public WritingModel getWritingModel() {
+        return this.writingModel;
+    }
+
 }
