@@ -259,7 +259,6 @@ public class Prodotto {
             } else {
                 String codiceTrim = ultimoCodice.trim();
                 String parteNumerica = codiceTrim.substring(prefisso.length());
-                System.out.println("Parte numerica: " + parteNumerica);
                 numero = Integer.parseInt(parteNumerica) + 1;
             }
 
