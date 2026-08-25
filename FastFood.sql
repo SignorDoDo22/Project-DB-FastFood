@@ -1,16 +1,16 @@
 -- *********************************************
--- * SQL MySQL generation
+-- * SQL MySQL generation                      
 -- *--------------------------------------------
--- * DB-MAIN version: 11.0.2
--- * Generator date: Sep 14 2021
--- * Generation date: Thu Aug  6 08:31:44 2026
--- * LUN file: C:\Users\baril\Desktop\Base di Dati\Scheletro P.D.B -  Prodotto.lun
--- * Schema: Schema_Rel_FastFood
--- *********************************************
+-- * DB-MAIN version: 11.0.2              
+-- * Generator date: Sep 14 2021              
+-- * Generation date: Thu Aug  6 08:31:44 2026 
+-- * LUN file: C:\Users\baril\Desktop\Base di Dati\Scheletro P.D.B -  Prodotto.lun 
+-- * Schema: Schema_Rel_FastFood 
+-- ********************************************* 
 
 
 -- Database Section
--- ________________
+-- ________________ 
 
 DROP DATABASE IF EXISTS schema_rel_fastfood;
 CREATE DATABASE IF NOT EXISTS schema_rel_fastfood;
@@ -21,7 +21,7 @@ FLUSH PRIVILEGES;
 USE schema_rel_fastfood;
 
 -- Tables Section
--- _____________
+-- _____________ 
 
 create table Categoria (
      IDCategoria char(50) not null,
@@ -164,12 +164,12 @@ create table Stato_Ordine (
 
 
 -- Constraints Section
--- ___________________
+-- ___________________ 
 
 -- Not implemented
 -- alter table Categoria add constraint ID_Categoria_CHK
 --     check(exists(select * from Prodotto
---                  where Prodotto.IDCategoria = IDCategoria));
+--                  where Prodotto.IDCategoria = IDCategoria)); 
 
 alter table ComponenteMenuOrdinato add constraint FKRiferisceCompMenu_FK
      foreign key (Codice_Prodotto)
@@ -198,7 +198,7 @@ alter table Comprende add constraint FKCom_Ing
 -- Not implemented
 -- alter table Menu add constraint FKPro_Men_CHK
 --     check(exists(select * from CompostoMenu
---                  where CompostoMenu.Codice_Menu = Codice_Prodotto));
+--                  where CompostoMenu.Codice_Menu = Codice_Prodotto)); 
 
 alter table Menu add constraint FKPro_Men_FK
      foreign key (Codice_Prodotto)
@@ -223,12 +223,12 @@ alter table ModificaProdottoSingolo add constraint FKMod_Rig_FK
 -- Not implemented
 -- alter table Ordine add constraint ID_Ordine_CHK
 --     check(exists(select * from Stato_Ordine
---                  where Stato_Ordine.Codice_Ordine = Codice_Ordine));
+--                  where Stato_Ordine.Codice_Ordine = Codice_Ordine)); 
 
 -- Not implemented
 -- alter table Ordine add constraint ID_Ordine_CHK
 --     check(exists(select * from Riga_prodotto
---                  where Riga_prodotto.Codice_Ordine = Codice_Ordine));
+--                  where Riga_prodotto.Codice_Ordine = Codice_Ordine)); 
 
 alter table Ordine add constraint FKPrende_in_carico_FK
      foreign key (Codice_Rider)
@@ -240,7 +240,7 @@ alter table Ordine add constraint FKCrea_FK
 
 alter table Prodotto add constraint EXTONE_Prodotto
      check((Singolo is not null and Menu is null)
-           or (Singolo is null and Menu is not null));
+           or (Singolo is null and Menu is not null)); 
 
 alter table Prodotto add constraint FKAppartiene_FK
      foreign key (IDCategoria)
@@ -252,7 +252,7 @@ alter table Recensione add constraint FKCorrisponde_FK
 
 alter table Riga_prodotto add constraint EXTONE_Riga_prodotto
      check((RigaProdottoSingolo is not null and RigaProdottoMenu is null)
-           or (RigaProdottoSingolo is null and RigaProdottoMenu is not null));
+           or (RigaProdottoSingolo is null and RigaProdottoMenu is not null)); 
 
 alter table Riga_prodotto add constraint FKContiene
      foreign key (Codice_Ordine)
@@ -261,7 +261,7 @@ alter table Riga_prodotto add constraint FKContiene
 -- Not implemented
 -- alter table RigaProdottoMenu add constraint FKRig_Rig_1_CHK
 --     check(exists(select * from ComponenteMenuOrdinato
---                  where ComponenteMenuOrdinato.Codice_Ordine = Codice_Ordine and ComponenteMenuOrdinato.CodiceRiga = CodiceRiga));
+--                  where ComponenteMenuOrdinato.Codice_Ordine = Codice_Ordine and ComponenteMenuOrdinato.CodiceRiga = CodiceRiga)); 
 
 alter table RigaProdottoMenu add constraint FKRig_Rig_1_FK
      foreign key (Codice_Ordine, CodiceRiga)
@@ -282,7 +282,7 @@ alter table RigaProdottoSingolo add constraint FKReferencSing_FK
 -- Not implemented
 -- alter table Singolo add constraint FKPro_Sin_CHK
 --     check(exists(select * from Comprende
---                  where Comprende.Codice_Prodotto = Codice_Prodotto));
+--                  where Comprende.Codice_Prodotto = Codice_Prodotto)); 
 
 alter table Singolo add constraint FKPro_Sin_FK
      foreign key (Codice_Prodotto)
@@ -294,7 +294,7 @@ alter table Stato_Ordine add constraint FKAggiorna_Stato
 
 
 -- Index Section
--- _____________
+-- _____________ 
 
 create unique index ID_Categoria_IND
      on Categoria (IDCategoria);
