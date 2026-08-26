@@ -446,9 +446,9 @@ insert into Prodotto (Disponibile, Codice_Prodotto, Nome_Prodotto, Prezzo_origin
 ('S', 'PRD05', 'Bacon Burger',        5.50,  'Panino con hamburger di manzo, bacon e cheddar',     'S', NULL, 'CAT01'),
 ('S', 'PRD06', 'Insalata',            4.00,  'Insalata fresca con lattuga e pomodoro',              'S', NULL, 'CAT03'),
 ('S', 'PRD07', 'Gelato',              2.50,  'Coppa di gelato artigianale',                          'S', NULL, 'CAT05'),
-('S', 'PRD08', 'Menu Cheeseburger',   8.50,  'Cheeseburger + patatine + bevanda',                   NULL, 'M', 'CAT04'),
-('S', 'PRD09', 'Menu Bacon Burger',   9.00,  'Bacon Burger + patatine + bevanda',                    NULL, 'M', 'CAT04'),
-('N', 'PRD10', 'Menu Family',         16.00, 'Doppio menu Cheeseburger + Bacon Burger da condividere', NULL, 'M', 'CAT04');
+('S', 'PRD08', 'Menu Cheeseburger',   8.50,  'Cheeseburger + patatine + bevanda',                   NULL, 'M', 'CAT01'),
+('S', 'PRD09', 'Menu Bacon Burger',   9.00,  'Bacon Burger + patatine + bevanda',                    NULL, 'M', 'CAT01'),
+('N', 'PRD10', 'Menu Family',         16.00, 'Doppio menu Cheeseburger + Bacon Burger da condividere', NULL, 'M', 'CAT01');
 
 -- -------------------------------------------------
 -- 3) Sottotipi di Prodotto: Singolo / Menu

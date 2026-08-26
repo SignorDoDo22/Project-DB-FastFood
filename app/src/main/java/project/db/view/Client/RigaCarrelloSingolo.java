@@ -35,6 +35,19 @@ public class RigaCarrelloSingolo extends RigaCarrello {
 
     public void EliminaIngredienteProdSingolo(String nomeIngrediente, Integer quantita) {
 
+        if (ingredientiModificatiProdSingolo.size() >= 4) {
+            modificaIngredientiPanel.showErrorMessage("Non puoi eliminare più di 4 ingredienti al prodotto singolo.");
+            return;
+        }
+
+        if (!controllerClientPanel.verificaEliminazioneIngrediente(nomeProdotto,
+                nomeIngrediente, quantita)) {
+            modificaIngredientiPanel
+                    .showErrorMessage(
+                            "Quantità richiesta per l'eliminazione dell'ingrediente non disponibile o ingrediente non presente.");
+            return;
+        }
+
         if (!ingredientiModificatiProdSingolo.containsKey(nomeIngrediente)) {
             ingredientiModificatiProdSingolo.put(nomeIngrediente, new Pair<>("Elimina", quantita));
         } else {
